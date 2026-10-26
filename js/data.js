@@ -189,6 +189,18 @@ const LOCATIONS = [
     quests: ["q.market.inventory"],
   },
   {
+    id: "loc.scryingpool",
+    name: "The Scrying Pool",
+    npc: "The Wandering Oracle",
+    npcArt: "🔮",
+    intro:
+      "Far off the usual paths, a pool of starlight ripples at your feet. A voice rises from within it: " +
+      "\"I am an echo of the Oracle who guards the AI Citadel, many regions from here. Before you journey on, " +
+      "let me show you a glimpse of what awaits — the craft of data science and machine learning.\"\n\n" +
+      "✨ Bonus quest — a sneak peek of the AI Citadel, playable right now.",
+    quests: ["q.oracle.datascience"],
+  },
+  {
     id: "loc.forestedge",
     name: "Forest's Edge",
     npc: "The Mimic Merchant",
@@ -409,6 +421,55 @@ const QUESTS = {
     tests: [
       { call: "total_cost(3, 2.5)", expected: 7.5, desc: "total_cost(3, 2.5) should be 7.5" },
       { call: "total_cost(10, 1.2)", expected: 12.0, desc: "total_cost(10, 1.2) should be 12.0" },
+    ],
+  },
+
+  "q.oracle.datascience": {
+    id: "q.oracle.datascience",
+    title: "Teach the Oracle to See",
+    skill: null,
+    location: "loc.scryingpool",
+    story:
+      "The pool shows you three visions of the AI Citadel's craft — the heart of data science and machine learning.\n\n" +
+      "1. Every model starts by understanding its data. Write `mean(values)` that returns the average of a list of numbers.\n\n" +
+      "2. Every model makes predictions from patterns. Write `predict(x, weight, bias)` that returns " +
+      "`weight * x + bias` — the simplest possible machine learning model: a straight line.\n\n" +
+      "3. Every model turns a number into a decision. Write `classify(prediction, threshold)` that returns " +
+      "`'yes'` if `prediction >= threshold`, otherwise `'no'`.",
+    starter:
+`def mean(values):
+    # Return the average of the list 'values'
+    # (data science starts with understanding your data)
+
+    pass
+
+
+def predict(x, weight, bias):
+    # Return weight * x + bias
+    # (a simple linear model — the same shape as y = mx + b)
+
+    pass
+
+
+def classify(prediction, threshold):
+    # Return 'yes' if prediction >= threshold, otherwise 'no'
+    # (turning a model's output into a decision)
+
+    pass
+`,
+    hints: [
+      "mean(values) = sum(values) / len(values). Python's built-in sum() and len() do the heavy lifting.",
+      "predict is one line: weight * x + bias — just like y = mx + b from math class.",
+      "classify needs a conditional: return 'yes' if prediction >= threshold else 'no'.",
+      "Full solution:\n\ndef mean(values):\n    return sum(values) / len(values)\n\n\ndef predict(x, weight, bias):\n    return weight * x + bias\n\n\ndef classify(prediction, threshold):\n    return 'yes' if prediction >= threshold else 'no'",
+    ],
+    tests: [
+      { call: "mean([2, 4, 6])", expected: 4, desc: "mean([2, 4, 6]) should be 4" },
+      { call: "mean([1, 2, 3, 4])", expected: 2.5, desc: "mean([1, 2, 3, 4]) should be 2.5" },
+      { call: "predict(3, 2, 1)", expected: 7, desc: "predict(3, 2, 1) should be 7 (2*3 + 1)" },
+      { call: "predict(0, 5, 10)", expected: 10, desc: "predict(0, 5, 10) should be 10" },
+      { call: "classify(0.8, 0.5)", expected: "yes", desc: "classify(0.8, 0.5) should be 'yes'" },
+      { call: "classify(0.2, 0.5)", expected: "no", desc: "classify(0.2, 0.5) should be 'no'" },
     ],
   },
 
