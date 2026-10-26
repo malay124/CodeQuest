@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CodeQuest: The World of Code</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header id="topbar">
+  <div id="topbar-title">🗺️ CodeQuest <span class="subtitle">The World of Code</span></div>
+  <div id="topbar-stats">
+    <span id="stat-skills">Skills: 0/8</span>
+    <span id="stat-quests">Quests: 0/7</span>
+    <button id="btn-journal" class="btn-ghost">📖 Journal</button>
+    <button id="btn-reset" class="btn-ghost danger">⟲ Reset</button>
+  </div>
+</header>
+
+<main id="app">
+
+  <!-- ============== WORLD MAP SCREEN ============== -->
+  <section id="screen-map" class="screen active">
+    <h1 class="screen-title">The World of Code</h1>
+    <p class="screen-sub">Choose a region to explore. Locked lands reveal what you must master first.</p>
+    <div id="map-canvas"></div>
+  </section>
+
+  <!-- ============== REGION SCREEN ============== -->
+  <section id="screen-region" class="screen">
+    <button class="btn-back" data-action="to-map">&larr; World Map</button>
+    <h1 id="region-title" class="screen-title"></h1>
+    <p id="region-sub" class="screen-sub"></p>
+
+    <div class="region-actions">
+      <button id="btn-skilltree" class="btn-primary">🌳 Skill Tree</button>
+    </div>
+
+    <div id="location-list" class="location-list"></div>
+  </section>
+
+  <!-- ============== LOCATION SCREEN ============== -->
+  <section id="screen-location" class="screen">
+    <button class="btn-back" data-action="to-region">&larr; Back</button>
+    <div class="npc-card">
+      <div id="loc-npc-art" class="npc-art"></div>
+      <div class="npc-text">
+        <h2 id="loc-npc-name"></h2>
+        <p id="loc-intro"></p>
+      </div>
+    </div>
+    <h3 class="quest-list-title">Quests here</h3>
+    <div id="quest-list" class="quest-list"></div>
+  </section>
+
+  <!-- ============== CHALLENGE SCREEN ============== -->
+  <section id="screen-challenge" class="screen">
+    <button class="btn-back" data-action="to-location">&larr; Back</button>
+    <h2 id="challenge-title" class="screen-title"></h2>
+    <div id="challenge-story" class="challenge-story"></div>
+
+    <div class="editor-wrap">
+      <textarea id="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    </div>
+
+    <div class="challenge-controls">
+      <button id="btn-run" class="btn-primary">▶ Run Code</button>
+      <button id="btn-hint" class="btn-ghost">💡 Hint (<span id="hint-count">0</span>/<span id="hint-max">0</span>)</button>
+      <span id="run-status" class="run-status"></span>
+    </div>
+
+    <div id="hint-box" class="hint-box hidden"></div>
+    <div id="results-box" class="results-box"></div>
+  </section>
+
+  <!-- ============== SKILL TREE SCREEN ============== -->
+  <section id="screen-skilltree" class="screen">
+    <button class="btn-back" data-action="to-region">&larr; Back</button>
+    <h1 class="screen-title">Verdant Vale Skill Tree</h1>
+    <p class="screen-sub">Each branch unlocks in order. Complete a quest to master its skill.</p>
+    <div id="skilltree-canvas" class="skilltree-canvas"></div>
+  </section>
+
+</main>
+
+<!-- ============== MODALS ============== -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div id="modal-box" class="modal-box"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+<script src="js/data.js"></script>
+<script src="js/save.js"></script>
+<script src="js/pyrunner.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>
