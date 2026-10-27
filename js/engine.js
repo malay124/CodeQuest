@@ -221,12 +221,90 @@ function regionProgress(regionId) {
   return { done, total: quests.length };
 }
 
+/* ---------- Terrain illustrations (one hand-drawn biome per region) ---------- */
+
+function terrainGlyph(regionId, x, y) {
+  switch (regionId) {
+    case "verdant-vale":
+      // Rolling green hills with a scatter of little trees.
+      return `
+        <ellipse cx="${x - 7}" cy="${y + 5}" rx="11" ry="5.5" fill="#2f5d44"/>
+        <ellipse cx="${x + 6}" cy="${y + 7}" rx="13" ry="6.5" fill="#3a7a57"/>
+        <ellipse cx="${x}" cy="${y + 2}" rx="15" ry="6.5" fill="#4caf7d"/>
+        <g fill="#24402f">
+          <path d="M ${x - 10} ${y - 1} l 2.2 -4.6 l 2.2 4.6 z"/>
+          <path d="M ${x - 2} ${y} l 2.2 -5.2 l 2.2 5.2 z"/>
+          <path d="M ${x + 7} ${y - 2} l 2.2 -4.6 l 2.2 4.6 z"/>
+        </g>`;
+    case "logic-labyrinth":
+      // A concentric hedge maze.
+      return `
+        <g fill="none" stroke="#9b8ef2" stroke-width="1" stroke-linecap="round">
+          <rect x="${x - 13}" y="${y - 13}" width="26" height="26" rx="2"/>
+          <rect x="${x - 9}" y="${y - 9}" width="18" height="18" rx="1.5"/>
+          <rect x="${x - 5}" y="${y - 5}" width="10" height="10"/>
+          <path d="M ${x} ${y - 13} L ${x} ${y - 9} M ${x} ${y + 9} L ${x} ${y + 13}
+                   M ${x - 13} ${y} L ${x - 9} ${y} M ${x + 9} ${y} L ${x + 13} ${y}"/>
+        </g>
+        <circle cx="${x}" cy="${y}" r="2" fill="#9b8ef2"/>`;
+    case "looping-wilds":
+      // Dense tree canopy with a looping river through it.
+      return `
+        <circle cx="${x - 10}" cy="${y - 2}" r="7" fill="#1f4f63"/>
+        <circle cx="${x + 8}" cy="${y - 5}" r="8.5" fill="#28647e"/>
+        <circle cx="${x}" cy="${y + 4}" r="9.5" fill="#3fa7d6"/>
+        <path d="M ${x - 17} ${y + 8} Q ${x - 7} ${y - 1} ${x + 2} ${y + 7} T ${x + 17} ${y + 3}"
+              stroke="#bfeafd" stroke-width="1.3" fill="none" stroke-linecap="round"/>`;
+    case "architects-spire":
+      // A stone mountain with a narrow tower and flag on top.
+      return `
+        <path d="M ${x - 14} ${y + 11} L ${x} ${y - 10} L ${x + 14} ${y + 11} Z" fill="#6f5324"/>
+        <path d="M ${x - 7} ${y + 11} L ${x - 1} ${y - 2} L ${x + 5} ${y + 11} Z" fill="#8a6220"/>
+        <rect x="${x - 1.4}" y="${y - 19}" width="2.8" height="9" fill="#caa35b"/>
+        <path d="M ${x - 3.5} ${y - 19} L ${x - 3.5} ${y - 19} L ${x + 4} ${y - 17} L ${x - 3.5} ${y - 15} Z" fill="#e0a23f"/>
+        <path d="M ${x - 3} ${y - 9} L ${x} ${y - 16} L ${x + 3} ${y - 9} Z" fill="#e0a23f"/>`;
+    case "data-dunes":
+      // Layered sand dunes.
+      return `
+        <path d="M ${x - 18} ${y + 8} Q ${x - 9} ${y + 1} ${x} ${y + 8} T ${x + 18} ${y + 8} L ${x + 18} ${y + 14} L ${x - 18} ${y + 14} Z" fill="#6b4420"/>
+        <path d="M ${x - 18} ${y + 2} Q ${x - 9} ${y - 6} ${x} ${y + 2} T ${x + 18} ${y + 2}"
+              stroke="#d68c45" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M ${x - 18} ${y - 4} Q ${x - 9} ${y - 11} ${x} ${y - 4} T ${x + 18} ${y - 4}"
+              stroke="#f0b26b" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>`;
+    case "ai-citadel":
+      // A cluster of glowing crystal spires.
+      return `
+        <path d="M ${x} ${y - 16} L ${x + 5.5} ${y - 3} L ${x} ${y + 5} L ${x - 5.5} ${y - 3} Z" fill="#c061d6"/>
+        <path d="M ${x - 11} ${y - 1} L ${x - 6} ${y + 7} L ${x - 11} ${y + 15} L ${x - 16} ${y + 7} Z" fill="#a24fc0" opacity="0.9"/>
+        <path d="M ${x + 11} ${y - 1} L ${x + 16} ${y + 7} L ${x + 11} ${y + 15} L ${x + 6} ${y + 7} Z" fill="#a24fc0" opacity="0.9"/>
+        <circle cx="${x}" cy="${y - 6}" r="1.4" fill="#f3d9ff"/>`;
+    default:
+      return "";
+  }
+}
+
 function renderMap() {
   const canvas = document.getElementById("map-canvas");
   canvas.innerHTML = "";
-  const RADIUS = 24;
+  const RADIUS = 22;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
+  // --- Background: hand-drawn terrain per region, joined by a dotted road ---
+  const roadPoints = REGIONS.map((r) => `${r.mapPos.x},${r.mapPos.y}`).join(" L ");
+  const terrainGroups = REGIONS.map((region) => {
+    const unlocked = isRegionUnlocked(region.id);
+    return `<g class="terrain-glyph${unlocked ? "" : " dimmed"}">${terrainGlyph(region.id, region.mapPos.x, region.mapPos.y)}</g>`;
+  }).join("");
+
+  const svg = `
+    <svg class="map-svg-layer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M ${roadPoints}" fill="none" stroke="#c9b37a" stroke-width="0.6" stroke-dasharray="2 2.4" opacity="0.4"/>
+      ${terrainGroups}
+    </svg>
+  `;
+  canvas.insertAdjacentHTML("beforeend", svg);
+
+  // --- Foreground: clickable pin markers, positioned over their terrain ---
   REGIONS.forEach((region) => {
     const unlocked = isRegionUnlocked(region.id);
     const { done, total } = regionProgress(region.id);
@@ -240,18 +318,20 @@ function renderMap() {
     node.style.top = region.mapPos.y + "%";
     node.innerHTML = `
       <div class="node-ring-wrap">
-        <svg viewBox="0 0 58 58">
-          <circle class="node-ring-bg" cx="29" cy="29" r="${RADIUS}"></circle>
-          <circle class="node-ring-fg" cx="29" cy="29" r="${RADIUS}"
+        <svg viewBox="0 0 54 54">
+          <circle class="node-ring-bg" cx="27" cy="27" r="${RADIUS}"></circle>
+          <circle class="node-ring-fg" cx="27" cy="27" r="${RADIUS}"
             stroke="${region.color}"
             stroke-dasharray="${CIRCUMFERENCE}"
             stroke-dashoffset="${unlocked ? offset : CIRCUMFERENCE}"></circle>
         </svg>
         <div class="node-ring-icon">${unlocked ? (cleared ? "🏆" : "") : "🔒"}</div>
       </div>
-      <div class="node-name">${region.name}</div>
-      <div class="node-sub">${region.subtitle}</div>
-      ${unlocked ? (total ? `<div class="node-lock" style="color:var(--text-dim)">${done}/${total} quests</div>` : "") : `<div class="node-lock">🔒 Requires: ${regionLabel(region.requires)}</div>`}
+      <div class="node-label-pill">
+        <div class="node-name">${region.name}</div>
+        <div class="node-sub">${region.subtitle}</div>
+        ${unlocked ? (total ? `<div class="node-lock" style="color:var(--text-dim)">${done}/${total} quests</div>` : "") : `<div class="node-lock">🔒 Requires: ${regionLabel(region.requires)}</div>`}
+      </div>
     `;
     node.addEventListener("click", () => {
       if (!unlocked) return;

@@ -231,45 +231,78 @@ button:active { transform: scale(0.97); }
   width: 100%;
   aspect-ratio: 16/9;
   background:
-    radial-gradient(ellipse 60% 50% at 20% 75%, rgba(52, 211, 153, 0.10) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 85% 25%, rgba(139, 123, 247, 0.10) 0%, transparent 60%),
-    linear-gradient(160deg, #0d1220 0%, #090c12 70%);
+    radial-gradient(ellipse 90% 70% at 50% 50%, #142338 0%, #0c1626 55%, #080e18 100%);
   border: 1px solid var(--border);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: var(--shadow-soft), inset 0 0 60px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-soft), inset 0 0 70px rgba(0,0,0,0.4);
 }
+/* faint parchment-grid texture under the terrain, like an old atlas */
+#map-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+}
+
+.map-svg-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.terrain-glyph { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); transition: filter 0.3s, opacity 0.3s; }
+.terrain-glyph.dimmed { filter: grayscale(85%) brightness(0.45); opacity: 0.6; }
 
 .region-node {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 158px;
-  padding: 14px 12px 12px;
-  border-radius: var(--radius);
-  text-align: center;
-  background: rgba(14, 18, 27, 0.78);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s, border-color 0.2s;
+  transition: transform 0.2s cubic-bezier(0.16,1,0.3,1);
+  z-index: 1;
 }
-.region-node:hover { transform: translate(-50%, -50%) scale(1.06); box-shadow: var(--shadow-lift); border-color: var(--border-strong); z-index: 2; }
-.region-node.locked { cursor: not-allowed; opacity: 0.55; filter: saturate(0.6); }
-.region-node.locked:hover { transform: translate(-50%, -50%); box-shadow: none; }
-.region-node.cleared { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(52,211,153,0.25), 0 0 24px -8px rgba(52,211,153,0.5); }
+.region-node:hover { transform: translate(-50%, -50%) scale(1.07); z-index: 3; }
+.region-node.locked { cursor: not-allowed; }
+.region-node.locked:hover { transform: translate(-50%, -50%); }
 
-.node-ring-wrap { width: 58px; height: 58px; margin: 0 auto 8px; position: relative; }
+.node-ring-wrap { width: 54px; height: 54px; position: relative; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
 .node-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.node-ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 4; }
-.node-ring-fg { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+.node-ring-bg { fill: rgba(9,12,18,0.55); stroke: rgba(255,255,255,0.12); stroke-width: 3; }
+.node-ring-fg { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
 .node-ring-icon {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.5em;
+  font-size: 1.35em;
 }
-.node-name { font-weight: 700; font-size: 0.92em; font-family: var(--font-display); }
-.node-sub { font-size: 0.72em; color: var(--text-dim); margin-top: 2px; }
-.node-lock { font-size: 0.7em; color: var(--gold); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.region-node.cleared .node-ring-wrap { filter: drop-shadow(0 0 12px rgba(52,211,153,0.6)); }
+
+.node-label-pill {
+  margin-top: 7px;
+  background: rgba(9, 12, 18, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 7px 12px;
+  text-align: center;
+  min-width: 130px;
+  max-width: 165px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.region-node:hover .node-label-pill { border-color: var(--border-strong); box-shadow: var(--shadow-soft); background: rgba(14, 18, 27, 0.92); }
+.region-node.cleared .node-label-pill { border-color: rgba(52,211,153,0.4); }
+.region-node.locked .node-label-pill { opacity: 0.68; }
+
+.node-name { font-weight: 700; font-size: 0.9em; font-family: var(--font-display); }
+.node-sub { font-size: 0.7em; color: var(--text-dim); margin-top: 2px; }
+.node-lock { font-size: 0.68em; color: var(--gold); margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
 
 /* ---------- Region / Locations ---------- */
 .region-actions { margin-bottom: 20px; }
@@ -638,6 +671,7 @@ button:active { transform: scale(0.97); }
 
 @media (max-width: 640px) {
   #map-canvas { aspect-ratio: 4/5; }
-  .region-node { width: 130px; font-size: 0.9em; }
+  .node-label-pill { min-width: 104px; max-width: 128px; font-size: 0.9em; }
+  .node-ring-wrap { width: 44px; height: 44px; }
   .title-heading { font-size: 2.2em; }
 }
