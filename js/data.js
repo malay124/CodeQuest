@@ -768,9 +768,9 @@ def classify(prediction, threshold):
     id: "boss.mimic-merchant",
     lesson: {
       title: "Review: The Verdant Vale",
-      body: "This boss combines everything from the Verdant Vale. Create variables with `=`, build text with f-strings `{}`, and combine numbers with `+ - * / // %`. If a hint stumps you, it's worth revisiting the quest where you first learned that skill.",
-      example: "name = \"Ada\"\ncharges = 3\nprint(f\"{name}'s ward holds for {charges} charges.\")\nprint(charges + 2)   # 5",
-      points: ["f-strings for building sentences","Plain arithmetic for combining numbers","Multiple functions can be defined in one file"],
+      body: "This boss tests everything from the Verdant Vale: variables, data types, f-strings, string concatenation, and arithmetic. If a function stumps you, it's worth revisiting the quest where you first learned that skill.",
+      example: "name = \"Ada\"\ncharges = 3\nprint(f\"{name}'s ward holds for {charges} charges.\")\nprint(type(charges).__name__)   # 'int'\nprint(\"Fire\" + \"Ice\")              # FireIce",
+      points: ["f-strings for building sentences", "type(x).__name__ for identifying data", "+ for both numbers and strings — context decides which"],
     },
     title: "Boss: The Mimic Merchant",
     skill: null,
@@ -778,15 +778,28 @@ def classify(prediction, threshold):
     isBoss: true,
     story:
       "The Mimic Merchant grins with too many teeth. \"I can copy ANYTHING... but I get the details wrong. " +
-      "Fix my spell before it unravels!\"\n\n" +
-      "Write `cast_ward(name, charges)` that returns the exact string:\n" +
-      "`f\"{name}'s ward holds for {charges} charges.\"`\n\n" +
-      "Then write `recharge(charges, amount)` that returns `charges + amount` as the new charge count.\n\n" +
-      "Both functions must work for the ward to hold — this challenge checks everything you've learned " +
-      "in the Verdant Vale: variables, types, strings, f-strings, and arithmetic.",
+      "Fix my spells before they unravel!\" Five spells need repair — together they test everything you've " +
+      "learned in the Verdant Vale.\n\n" +
+      "1. `identify_essence(value)` — return the type name of `value` as a string (`'int'`, `'float'`, `'str'`, or `'bool'`).\n\n" +
+      "2. `cast_ward(name, charges)` — return `f\"{name}'s ward holds for {charges} charges.\"`\n\n" +
+      "3. `combine_runes(a, b)` — return `a + b`, joining two rune strings together.\n\n" +
+      "4. `recharge(charges, amount)` — return `charges + amount` as the new charge count.\n\n" +
+      "5. `empower(brightness)` — create a variable `empowered` set to `brightness * 2`, then return it.",
     starter:
-`def cast_ward(name, charges):
+`def identify_essence(value):
+    # Return the type of 'value' as a string: 'int', 'float', 'str', or 'bool'
+
+    pass
+
+
+def cast_ward(name, charges):
     # Return f"{name}'s ward holds for {charges} charges."
+
+    pass
+
+
+def combine_runes(a, b):
+    # Return a + b (string concatenation)
 
     pass
 
@@ -795,28 +808,31 @@ def recharge(charges, amount):
     # Return charges + amount
 
     pass
+
+
+def empower(brightness):
+    # Create a variable 'empowered' set to brightness * 2, then return it
+
+    pass
 `,
     hints: [
-      "This is two functions in one challenge — make sure both are filled in.",
-      "cast_ward is an f-string, just like in Potioncraft. recharge is simple addition.",
-      "Full solution:\n\ndef cast_ward(name, charges):\n    return f\"{name}'s ward holds for {charges} charges.\"\n\n\ndef recharge(charges, amount):\n    return charges + amount",
+      "This is five functions in one challenge — make sure all five are filled in before running.",
+      "identify_essence uses type(value).__name__. combine_runes just needs + between two strings.",
+      "empower needs a real variable: `empowered = brightness * 2` then `return empowered` — not just `return brightness * 2`.",
+      "Full solution:\n\ndef identify_essence(value):\n    return type(value).__name__\n\n\ndef cast_ward(name, charges):\n    return f\"{name}'s ward holds for {charges} charges.\"\n\n\ndef combine_runes(a, b):\n    return a + b\n\n\ndef recharge(charges, amount):\n    return charges + amount\n\n\ndef empower(brightness):\n    empowered = brightness * 2\n    return empowered",
     ],
     tests: [
+      { call: "identify_essence(5)", expected: "int", desc: "identify_essence(5) should be 'int'" },
+      { call: "identify_essence('hi')", expected: "str", desc: "identify_essence('hi') should be 'str'" },
       {
         call: "cast_ward('Ada', 3)",
         expected: "Ada's ward holds for 3 charges.",
         desc: "cast_ward('Ada', 3) should describe the ward",
       },
-      {
-        call: "recharge(3, 2)",
-        expected: 5,
-        desc: "recharge(3, 2) should be 5",
-      },
-      {
-        call: "recharge(10, 0)",
-        expected: 10,
-        desc: "recharge(10, 0) should be 10",
-      },
+      { call: "combine_runes('Fire', 'Ice')", expected: "FireIce", desc: "combine_runes('Fire', 'Ice') should be 'FireIce'" },
+      { call: "recharge(3, 2)", expected: 5, desc: "recharge(3, 2) should be 5" },
+      { call: "recharge(10, 0)", expected: 10, desc: "recharge(10, 0) should be 10" },
+      { call: "empower(10)", expected: 20, desc: "empower(10) should be 20" },
     ],
   },
 
@@ -1002,21 +1018,23 @@ def negate(flag):
     id: "boss.gatekeeper",
     lesson: {
       title: "Review: The Logic Labyrinth",
-      body: "This boss combines comparisons, `and`, and nested conditionals. Check the most important condition first (like a ban), then use `and` to require multiple things together, then fall back to a default case.",
+      body: "This boss tests everything from the Logic Labyrinth: nested conditionals, comparisons, `and`, `or`, and `not`. Check the most important condition first (like a ban), combine requirements with `and`, accept alternatives with `or`, and flip a flag with `not`.",
       example: "is_banned = False\nage, has_pass = 25, True\nif is_banned:\n    print(\"turned away\")\nelif age >= 18 and has_pass:\n    print(\"admitted\")       # this one runs\nelse:\n    print(\"needs escort\")",
-      points: ["Order conditions by priority","and combines multiple requirements","A final else is your safety net"],
+      points: ["Order conditions by priority", "and requires both, or requires either", "not flips a boolean to its opposite"],
     },
     title: "Boss: The Gatekeeper",
     skill: null,
     location: "loc.vault",
     isBoss: true,
     story:
-      "The Gatekeeper's locks whir and click. \"Prove you've mastered logic, or stay lost forever.\"\n\n" +
-      "Write `classify_traveler(age, has_pass, is_banned)`:\n" +
-      "- If `is_banned` is True, return `'turned away'` no matter what.\n" +
-      "- Otherwise, if `age >= 18` AND `has_pass` is True, return `'admitted'`.\n" +
-      "- Otherwise, return `'needs escort'`.\n\n" +
-      "This combines everything from the Logic Labyrinth: comparisons, `and`, and nested conditionals.",
+      "The Gatekeeper's locks whir and click. \"Prove you've mastered logic, or stay lost forever.\" Three " +
+      "trials await — together they test everything from the Logic Labyrinth.\n\n" +
+      "1. `classify_traveler(age, has_pass, is_banned)`:\n" +
+      "   - If `is_banned` is True, return `'turned away'` no matter what.\n" +
+      "   - Otherwise, if `age >= 18` AND `has_pass` is True, return `'admitted'`.\n" +
+      "   - Otherwise, return `'needs escort'`.\n\n" +
+      "2. `gate_decision(has_token, has_vouch)` — return `True` if EITHER `has_token` OR `has_vouch` is True.\n\n" +
+      "3. `reverse_seal(flag)` — return the opposite of `flag`.",
     starter:
 `def classify_traveler(age, has_pass, is_banned):
     # 'turned away' if is_banned
@@ -1024,17 +1042,33 @@ def negate(flag):
     # else: 'needs escort'
 
     pass
+
+
+def gate_decision(has_token, has_vouch):
+    # Return True if has_token OR has_vouch is True
+
+    pass
+
+
+def reverse_seal(flag):
+    # Return the opposite of flag
+
+    pass
 `,
     hints: [
-      "Check is_banned FIRST — it overrides everything else.",
-      "Combine age >= 18 and has_pass with `and` in your elif condition.",
-      "Full solution:\n\ndef classify_traveler(age, has_pass, is_banned):\n    if is_banned:\n        return 'turned away'\n    elif age >= 18 and has_pass:\n        return 'admitted'\n    else:\n        return 'needs escort'",
+      "Check is_banned FIRST in classify_traveler — it overrides everything else.",
+      "gate_decision uses `or`. reverse_seal uses `not`.",
+      "Full solution:\n\ndef classify_traveler(age, has_pass, is_banned):\n    if is_banned:\n        return 'turned away'\n    elif age >= 18 and has_pass:\n        return 'admitted'\n    else:\n        return 'needs escort'\n\n\ndef gate_decision(has_token, has_vouch):\n    return has_token or has_vouch\n\n\ndef reverse_seal(flag):\n    return not flag",
     ],
     tests: [
       { call: "classify_traveler(25, True, False)", expected: "admitted", desc: "adult with pass, not banned" },
       { call: "classify_traveler(25, False, False)", expected: "needs escort", desc: "adult without pass" },
       { call: "classify_traveler(15, True, False)", expected: "needs escort", desc: "minor with pass" },
       { call: "classify_traveler(25, True, True)", expected: "turned away", desc: "banned overrides everything" },
+      { call: "gate_decision(True, False)", expected: true, desc: "gate_decision(True, False) should be True" },
+      { call: "gate_decision(False, False)", expected: false, desc: "gate_decision(False, False) should be False" },
+      { call: "reverse_seal(True)", expected: false, desc: "reverse_seal(True) should be False" },
+      { call: "reverse_seal(False)", expected: true, desc: "reverse_seal(False) should be True" },
     ],
   },
 
@@ -1215,20 +1249,22 @@ def negate(flag):
     id: "boss.hydra",
     lesson: {
       title: "Review: The Looping Wilds",
-      body: "This boss combines dictionary tallying with a manual search loop. To find the dictionary entry with the highest value, loop over `.items()` and keep track of the best one seen so far — the same 'running best' pattern used for running totals.",
+      body: "This boss tests everything from the Looping Wilds: for loops, while loops, lists, dictionaries, and list comprehensions. To find the dictionary entry with the highest value, loop over `.items()` and keep track of the best one seen so far.",
       example: "counts = {\"fire\": 3, \"ice\": 1}\nbest_key, best_value = None, -1\nfor key, value in counts.items():\n    if value > best_value:\n        best_key, best_value = key, value\nprint(best_key)   # fire",
-      points: [".items() gives you (key, value) pairs to loop over","Track the 'best so far' as you go","This pattern works for max, min, or any custom comparison"],
+      points: [".items() gives you (key, value) pairs to loop over", "A while loop keeps going until its condition is False", "A list comprehension builds a list in one line"],
     },
     title: "Boss: The Infinite Hydra",
     skill: null,
     location: "loc.hydraslair",
     isBoss: true,
     story:
-      "Heads snarl from every direction. \"Count us if you can!\" the Hydra roars.\n\n" +
-      "Write `tally(creatures)` — reuse your dict-tallying skill to count each head type in the list.\n\n" +
-      "Then write `strongest(counts)` that takes a dict of counts and returns the key with the HIGHEST " +
-      "value, looping over the dict to find it (don't just call `max()` with a key function — loop it by hand).\n\n" +
-      "Together these defeat the Hydra by finding its most common — and most dangerous — head.",
+      "Heads snarl from every direction. \"Count us, hold us back, and strike true — if you can!\" the Hydra " +
+      "roars. Four trials test everything from the Looping Wilds.\n\n" +
+      "1. `tally(creatures)` — reuse your dict-tallying skill (a `for` loop) to count each head type in the list.\n\n" +
+      "2. `strongest(counts)` — loop over a dict of counts and return the key with the HIGHEST value (don't " +
+      "just call `max()` — loop it by hand).\n\n" +
+      "3. `collect_heads(n)` — use a `while` loop to build and return the list `[n, n-1, ..., 1]`.\n\n" +
+      "4. `scaled_damage(damage_list)` — use a list comprehension to return a new list with every value doubled.",
     starter:
 `def tally(creatures):
     counts = {}
@@ -1245,11 +1281,26 @@ def strongest(counts):
     # your loop here
 
     return best_key
+
+
+def collect_heads(n):
+    # Use a while loop to build [n, n-1, ..., 1]
+
+    result = []
+
+    return result
+
+
+def scaled_damage(damage_list):
+    # Return a new list with every value doubled, using a list comprehension
+
+    pass
 `,
     hints: [
       "tally() is the same pattern as count_creatures from the Beast Pens.",
-      "For strongest(), loop with `for key, value in counts.items():` and keep track of the best so far.",
-      "Full solution:\n\ndef tally(creatures):\n    counts = {}\n    for c in creatures:\n        counts[c] = counts.get(c, 0) + 1\n    return counts\n\n\ndef strongest(counts):\n    best_key = None\n    best_value = -1\n    for key, value in counts.items():\n        if value > best_value:\n            best_key = key\n            best_value = value\n    return best_key",
+      "collect_heads is the same pattern as countdown() from Lumber Camp: `while n > 0:` then append and decrement.",
+      "scaled_damage is a one-liner: `[d * 2 for d in damage_list]`.",
+      "Full solution:\n\ndef tally(creatures):\n    counts = {}\n    for c in creatures:\n        counts[c] = counts.get(c, 0) + 1\n    return counts\n\n\ndef strongest(counts):\n    best_key = None\n    best_value = -1\n    for key, value in counts.items():\n        if value > best_value:\n            best_key = key\n            best_value = value\n    return best_key\n\n\ndef collect_heads(n):\n    result = []\n    while n > 0:\n        result.append(n)\n        n -= 1\n    return result\n\n\ndef scaled_damage(damage_list):\n    return [d * 2 for d in damage_list]",
     ],
     tests: [
       {
@@ -1267,6 +1318,8 @@ def strongest(counts):
         expected: "b",
         desc: "strongest should identify 'b' as the highest count",
       },
+      { call: "collect_heads(3)", expected: [3, 2, 1], desc: "collect_heads(3) should be [3, 2, 1]" },
+      { call: "scaled_damage([1, 2, 3])", expected: [2, 4, 6], desc: "scaled_damage([1, 2, 3]) should be [2, 4, 6]" },
     ],
   },
 
@@ -1441,23 +1494,34 @@ def strongest(counts):
     id: "boss.golem",
     lesson: {
       title: "Review: The Architect's Spire",
-      body: "This boss combines a default parameter with `*args`. Build each piece with a familiar function shape, then sum up any number of values the same way `total_power()` did earlier in the Spire.",
+      body: "This boss tests everything from the Architect's Spire: default parameters, returning multiple values, `*args`, recursion, and debugging. Build each piece with a familiar function shape, and read the buggy starter carefully before fixing it.",
       example: "def build_part(name, strength=10):\n    return f\"{name}: {strength}\"\n\ndef total_strength(*parts):\n    return sum(parts)\n\nprint(build_part(\"Arm\"))          # Arm: 10\nprint(total_strength(10, 25, 5))    # 40",
-      points: ["Default parameters make arguments optional","*args handles any number of inputs","Two independent functions can reuse the same ideas"],
+      points: ["Default parameters make arguments optional", "*args handles any number of inputs", "A recursive function needs a base case to stop"],
     },
     title: "Boss: The Broken Golem",
     skill: null,
     location: "loc.golemyard",
     isBoss: true,
     story:
-      "The Golem lurches upright, half its glyphs missing. \"REBUILD... ME...\" it groans.\n\n" +
-      "Write `build_part(name, strength=10)` that returns `f\"{name}: {strength}\"` using a default parameter.\n\n" +
-      "Then write `total_strength(*parts)` that accepts any number of strength VALUES (not strings — plain " +
-      "numbers) and returns their sum using `*args`.\n\n" +
-      "This combines default parameters with variable-length arguments — the full toolkit of the Spire.",
+      "The Golem lurches upright, half its glyphs missing. \"REBUILD... ME...\" it groans. Five parts need " +
+      "repair — together they are the full toolkit of the Spire.\n\n" +
+      "1. `build_part(name, strength=10)` — return `f\"{name}: {strength}\"` using a default parameter.\n\n" +
+      "2. `split_label(label)` — split a `'Type Name'` string on the space and return both halves as a " +
+      "tuple: `(type, name)`.\n\n" +
+      "3. `total_strength(*parts)` — accept any number of strength values and return their sum, using `*args`.\n\n" +
+      "4. `activate_sequence(n)` — compute `n!` (`n * (n-1) * ... * 1`) using RECURSION, with a base case of " +
+      "`activate_sequence(0) == 1`.\n\n" +
+      "5. `repair_golem(parts)` — this one is already written, but it's BUGGY: it's supposed to sum a list " +
+      "of part strengths, but doesn't. Find the bug and fix it.",
     starter:
 `def build_part(name, strength=10):
     # Return f"{name}: {strength}"
+
+    pass
+
+
+def split_label(label):
+    # Split "Type Name" on the space and return (type, name)
 
     pass
 
@@ -1466,16 +1530,35 @@ def total_strength(*parts):
     # Sum every value in 'parts'
 
     pass
+
+
+def activate_sequence(n):
+    # Base case: activate_sequence(0) is 1
+    # Recursive case: n * activate_sequence(n - 1)
+
+    pass
+
+
+def repair_golem(parts):
+    total = 0
+    for p in parts:
+        total = p  # bug: this overwrites total instead of accumulating it
+    return total
 `,
     hints: [
-      "build_part is the same shape as craft() from the Workshop.",
-      "total_strength is the same shape as total_power() — just a new name.",
-      "Full solution:\n\ndef build_part(name, strength=10):\n    return f\"{name}: {strength}\"\n\n\ndef total_strength(*parts):\n    return sum(parts)",
+      "build_part is the same shape as craft() from the Workshop. split_label is the same shape as split_name().",
+      "activate_sequence is the same shape as factorial() from the Library of Modules.",
+      "For repair_golem, compare it to average() from Fix the Golem (the quest) — the fix is the same: = should be +=.",
+      "Full solution:\n\ndef build_part(name, strength=10):\n    return f\"{name}: {strength}\"\n\n\ndef split_label(label):\n    kind, name = label.split(' ')\n    return kind, name\n\n\ndef total_strength(*parts):\n    return sum(parts)\n\n\ndef activate_sequence(n):\n    if n == 0:\n        return 1\n    return n * activate_sequence(n - 1)\n\n\ndef repair_golem(parts):\n    total = 0\n    for p in parts:\n        total += p\n    return total",
     ],
     tests: [
       { call: "build_part('Arm')", expected: "Arm: 10", desc: "build_part('Arm') should use default strength" },
       { call: "build_part('Leg', 25)", expected: "Leg: 25", desc: "build_part('Leg', 25) should override strength" },
+      { call: "split_label('Arm Alpha')", expected: ["Arm", "Alpha"], desc: "split_label('Arm Alpha') should be ('Arm', 'Alpha')" },
       { call: "total_strength(10, 25, 5)", expected: 40, desc: "total_strength(10, 25, 5) should be 40" },
+      { call: "activate_sequence(4)", expected: 24, desc: "activate_sequence(4) should be 24" },
+      { call: "activate_sequence(0)", expected: 1, desc: "activate_sequence(0) should be 1" },
+      { call: "repair_golem([10, 20, 30])", expected: 60, desc: "repair_golem([10, 20, 30]) should be 60" },
     ],
   },
 
@@ -1680,22 +1763,25 @@ def parse_title(json_string):
     id: "boss.archivist",
     lesson: {
       title: "Review: The Data Dunes",
-      body: "This boss combines error handling with JSON parsing and safe dictionary access. Wrap risky parsing in `try`/`except`, and use `.get(key, default)` so a missing field never crashes the whole operation.",
+      body: "This boss tests everything from the Data Dunes: error handling, JSON parsing, safe dictionary access, classes, and searching structured data. Wrap risky parsing in `try`/`except`, and use `.get(key, default)` so a missing field never crashes the whole operation.",
       example: "import json\ntry:\n    data = json.loads(\"not valid json{{{\")\nexcept Exception:\n    data = {\"error\": \"corrupted\"}\nprint(data)   # {'error': 'corrupted'}",
-      points: ["Catching a bare Exception covers any parse failure",".get() with a default keeps missing fields from crashing you","Combine small safe patterns to build a robust pipeline"],
+      points: ["Catching a bare Exception covers any parse failure", ".get() with a default keeps missing fields from crashing you", "A class bundles data (self.x) with behavior (methods)"],
     },
     title: "Boss: The Archivist",
     skill: null,
     location: "loc.archivistchamber",
     isBoss: true,
     story:
-      "Scattered scrolls swirl into a towering shape. \"SOME... OF ME... IS CORRUPTED,\" it intones.\n\n" +
-      "Write `safe_parse(json_string)` that tries to `json.loads(json_string)` and returns the resulting " +
-      "dict — but if it raises any exception (malformed JSON), catch it and return `{'error': 'corrupted'}` " +
-      "instead of crashing.\n\n" +
-      "Then write `extract_titles(records)` that takes a list of dicts and returns a list of each record's " +
-      "`'title'` value, using `.get('title', 'untitled')` so missing titles don't crash it either.\n\n" +
-      "This combines error handling, JSON parsing, and safe dictionary access — everything from the Dunes.",
+      "Scattered scrolls swirl into a towering shape. \"SOME... OF ME... IS CORRUPTED,\" it intones. Four " +
+      "trials test everything from the Data Dunes.\n\n" +
+      "1. `safe_parse(json_string)` — try `json.loads(json_string)` and return the resulting dict, but if " +
+      "it raises any exception (malformed JSON), catch it and return `{'error': 'corrupted'}` instead of crashing.\n\n" +
+      "2. `safe_field(record, key)` — return `record[key]` if present, or the string `'unknown'` if the key " +
+      "is missing, using `.get()`.\n\n" +
+      "3. Define a class `Artifact` with `__init__(self, title, power)` storing both, and a method " +
+      "`describe(self)` that returns `f\"{title} (power {power})\"`.\n\n" +
+      "4. `find_record(records, name)` — search a list of dicts (each with a `'name'` key) and return the " +
+      "FIRST matching record, or `None` if nothing matches.",
     starter:
 `import json
 
@@ -1705,15 +1791,35 @@ def safe_parse(json_string):
     pass
 
 
-def extract_titles(records):
-    # Return a list of each record's 'title', defaulting to 'untitled' if missing
+def safe_field(record, key):
+    # Return record[key] if present, else 'unknown'
+
+    pass
+
+
+class Artifact:
+    def __init__(self, title, power):
+        # Store title and power
+
+        pass
+
+    def describe(self):
+        # Return f"{self.title} (power {self.power})"
+
+        pass
+
+
+def find_record(records, name):
+    # Loop over records and return the first one whose 'name' matches
+    # Return None if nothing matches
 
     pass
 `,
     hints: [
       "safe_parse needs a try/except around json.loads — catch a bare `Exception` to cover any parse error.",
-      "extract_titles can be a list comprehension: `[r.get('title', 'untitled') for r in records]`",
-      "Full solution:\n\nimport json\n\ndef safe_parse(json_string):\n    try:\n        return json.loads(json_string)\n    except Exception:\n        return {'error': 'corrupted'}\n\n\ndef extract_titles(records):\n    return [r.get('title', 'untitled') for r in records]",
+      "safe_field is the same pattern as get_field() from the Archive Vault: `record.get(key, 'unknown')`.",
+      "Artifact is the same shape as the Scroll class from Records Hall. find_record is the same pattern as find_by_name().",
+      "Full solution:\n\nimport json\n\ndef safe_parse(json_string):\n    try:\n        return json.loads(json_string)\n    except Exception:\n        return {'error': 'corrupted'}\n\n\ndef safe_field(record, key):\n    return record.get(key, 'unknown')\n\n\nclass Artifact:\n    def __init__(self, title, power):\n        self.title = title\n        self.power = power\n\n    def describe(self):\n        return f\"{self.title} (power {self.power})\"\n\n\ndef find_record(records, name):\n    for record in records:\n        if record['name'] == name:\n            return record\n    return None",
     ],
     tests: [
       {
@@ -1726,10 +1832,13 @@ def extract_titles(records):
         expected: { error: "corrupted" },
         desc: "should catch a parse error and return the corrupted marker",
       },
+      { call: "safe_field({'name': 'Ada'}, 'name')", expected: "Ada", desc: "safe_field should return the existing field" },
+      { call: "safe_field({'name': 'Ada'}, 'age')", expected: "unknown", desc: "safe_field should return 'unknown' for a missing key" },
+      { call: "Artifact('Orb', 50).describe()", expected: "Orb (power 50)", desc: "Artifact('Orb', 50).describe() should describe the artifact" },
       {
-        call: "extract_titles([{'title': 'A'}, {'pages': 5}, {'title': 'C'}])",
-        expected: ["A", "untitled", "C"],
-        desc: "should extract titles, defaulting missing ones to 'untitled'",
+        call: "find_record([{'name': 'Ada'}, {'name': 'Rin'}], 'Rin')",
+        expected: { name: "Rin" },
+        desc: "find_record should find the record named 'Rin'",
       },
     ],
   },
@@ -1926,29 +2035,47 @@ def normalize(values):
 
   "boss.oracle": {
     id: "boss.oracle",
+    pyPackages: ["numpy"],
     lesson: {
-      title: "Review: Training a Real Model",
-      body: "Training a model for real means repeating the gradient-descent update across your whole dataset, multiple times — each full pass through all the data is called an 'epoch'. Once trained, making a prediction is just plugging a new x into `weight * x + bias`.",
+      title: "Review: A Full Data Science & ML Pipeline",
+      body: "This final boss walks the entire pipeline a real data scientist follows: describe your data with NumPy, scale it, train a model with gradient descent, make predictions, and evaluate how good those predictions are. Every piece is something you've already built — this just strings them together.",
       example: "# One epoch = one pass through ALL the data\nfor x, y in zip(xs, ys):\n    weight, bias = gradient_step(x, y, weight, bias, lr)\n# Repeat for many epochs to let it converge",
-      points: ["An epoch is one full pass over the training data","More epochs (usually) means a better-fit model","Prediction, after training, is just weight * x + bias"],
+      points: ["Describe → scale → train → predict → evaluate is the real ML workflow", "An epoch is one full pass over the training data", "Accuracy is correct predictions divided by total predictions"],
     },
     title: "Boss: The Oracle",
     skill: null,
     location: "loc.oraclesanctum",
     isBoss: true,
     story:
-      "The Oracle's many eyes open at once. \"SHOW ME YOU UNDERSTAND, NOT JUST THAT YOU CAN COPY.\"\n\n" +
-      "This final challenge combines everything from the Citadel.\n\n" +
-      "Write `train(xs, ys, weight, bias, lr, epochs)`: starting from `weight` and `bias`, call your " +
-      "gradient-descent update ONCE PER (x, y) PAIR, for `epochs` full passes over the data (a 'pass over " +
-      "all the data' is what's called an epoch). Update rule for each example: " +
-      "`prediction = weight * x + bias`, `error = prediction - y`, " +
-      "`weight = weight - lr * 2 * error * x`, `bias = bias - lr * 2 * error`. " +
-      "Return the final `(weight, bias)` after all epochs.\n\n" +
-      "Then write `predict_all(xs, weight, bias)` that returns a list of `weight * x + bias` for every `x` " +
-      "in `xs` — using your trained model to make predictions.",
+      "The Oracle's many eyes open at once. \"SHOW ME YOU UNDERSTAND, NOT JUST THAT YOU CAN COPY.\" Five " +
+      "trials form the complete pipeline — everything from the AI Citadel.\n\n" +
+      "1. `describe_data(values)` — using NumPy, return `(mean, std)` as a tuple of plain floats.\n\n" +
+      "2. `normalize_data(values)` — using NumPy, standardize the values (subtract the mean, divide by the " +
+      "std) and return the result as a plain Python list.\n\n" +
+      "3. `train(xs, ys, weight, bias, lr, epochs)` — starting from `weight` and `bias`, call the " +
+      "gradient-descent update ONCE PER (x, y) PAIR, for `epochs` full passes over the data. Update rule: " +
+      "`prediction = weight * x + bias`, `error = prediction - y`, `weight = weight - lr * 2 * error * x`, " +
+      "`bias = bias - lr * 2 * error`. Return the final `(weight, bias)`.\n\n" +
+      "4. `predict_all(xs, weight, bias)` — return a list of `weight * x + bias` for every `x` in `xs`, " +
+      "using your trained model to make predictions.\n\n" +
+      "5. `evaluate(predictions, actuals)` — return the fraction of predictions that exactly match the " +
+      "actual values.",
     starter:
-`def train(xs, ys, weight, bias, lr, epochs):
+`import numpy as np
+
+def describe_data(values):
+    # Return (mean, std) as a tuple of plain floats, using NumPy
+
+    pass
+
+
+def normalize_data(values):
+    # Standardize values with NumPy: (arr - mean) / std, returned as a list
+
+    pass
+
+
+def train(xs, ys, weight, bias, lr, epochs):
     for epoch in range(epochs):
         for x, y in zip(xs, ys):
             prediction = weight * x + bias
@@ -1962,13 +2089,22 @@ def predict_all(xs, weight, bias):
     # Return [weight * x + bias for x in xs]
 
     pass
+
+
+def evaluate(predictions, actuals):
+    # Return the fraction of predictions that match actuals
+
+    pass
 `,
     hints: [
+      "describe_data and normalize_data are the same shape as the Observatory quests — just named for the final pipeline.",
       "train() is already fully implemented in the starter code — it's the same update rule from Train the Oracle, just looped.",
-      "predict_all is a one-line list comprehension, just like doubles() in the Looping Wilds.",
-      "Full solution:\n\ndef train(xs, ys, weight, bias, lr, epochs):\n    for epoch in range(epochs):\n        for x, y in zip(xs, ys):\n            prediction = weight * x + bias\n            error = prediction - y\n            weight = weight - lr * 2 * error * x\n            bias = bias - lr * 2 * error\n    return weight, bias\n\n\ndef predict_all(xs, weight, bias):\n    return [weight * x + bias for x in xs]",
+      "predict_all is a one-line list comprehension. evaluate is the same pattern as accuracy() from the Forge of Models.",
+      "Full solution:\n\nimport numpy as np\n\ndef describe_data(values):\n    arr = np.array(values)\n    return float(np.mean(arr)), float(np.std(arr))\n\n\ndef normalize_data(values):\n    arr = np.array(values)\n    mean, std = np.mean(arr), np.std(arr)\n    return ((arr - mean) / std).tolist()\n\n\ndef train(xs, ys, weight, bias, lr, epochs):\n    for epoch in range(epochs):\n        for x, y in zip(xs, ys):\n            prediction = weight * x + bias\n            error = prediction - y\n            weight = weight - lr * 2 * error * x\n            bias = bias - lr * 2 * error\n    return weight, bias\n\n\ndef predict_all(xs, weight, bias):\n    return [weight * x + bias for x in xs]\n\n\ndef evaluate(predictions, actuals):\n    correct = sum(1 for p, a in zip(predictions, actuals) if p == a)\n    return correct / len(predictions)",
     ],
     tests: [
+      { call: "describe_data([2, 4, 4, 4, 5, 5, 7, 9])", expected: [5, 2], desc: "describe_data(...) should return mean=5, std=2" },
+      { call: "normalize_data([3, 5])", expected: [-1, 1], desc: "normalize_data([3, 5]) should center and scale to [-1, 1]" },
       {
         call: "[round(v, 4) for v in train([1, 2, 3], [2, 4, 6], 0, 0, 0.1, 100)]",
         expected: [2, 0],
@@ -1979,6 +2115,7 @@ def predict_all(xs, weight, bias):
         expected: [3, 5],
         desc: "predict_all([1, 2], 2, 1) should return [3, 5]",
       },
+      { call: "evaluate([1, 0, 1, 1], [1, 0, 0, 1])", expected: 0.75, desc: "evaluate([1,0,1,1], [1,0,0,1]) should be 0.75" },
     ],
   },
 };
