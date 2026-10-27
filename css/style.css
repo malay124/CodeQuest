@@ -363,6 +363,56 @@ button:active { transform: scale(0.97); }
 .quest-row.boss:hover { border-color: var(--danger); }
 .quest-row.boss .quest-status { color: var(--danger); }
 
+/* ---------- Lesson screen ---------- */
+.lesson-card {
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-soft);
+  max-width: 720px;
+}
+.lesson-kicker {
+  display: inline-block;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  background: var(--accent-2-soft);
+  border: 1px solid rgba(139, 123, 247, 0.3);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin-bottom: 10px;
+}
+.lesson-body { color: var(--text-dim); line-height: 1.7; font-size: 1.02em; margin: 0 0 20px; }
+.lesson-example-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-soft);
+}
+.lesson-example-label {
+  background: var(--bg-panel-2);
+  color: var(--text-dim);
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+#lesson-example-editor .CodeMirror {
+  min-height: 0;
+  max-height: none;
+  background: #0a0e14;
+}
+.lesson-points { margin: 0 0 24px; padding-left: 20px; color: var(--text-dim); line-height: 1.8; }
+.lesson-points li::marker { color: var(--accent); }
+.lesson-cta { width: 100%; padding: 14px; font-size: 1.05em; }
+
 /* ---------- Challenge screen ---------- */
 .challenge-story {
   background: var(--bg-panel);

@@ -94,6 +94,22 @@
     <div id="quest-list" class="quest-list"></div>
   </section>
 
+  <!-- ============== LESSON SCREEN ============== -->
+  <section id="screen-lesson" class="screen">
+    <button id="btn-lesson-back" class="btn-back">&larr; Back</button>
+    <div class="lesson-card">
+      <div class="lesson-kicker">📘 Lesson</div>
+      <h2 id="lesson-title" class="screen-title"></h2>
+      <p id="lesson-body" class="lesson-body"></p>
+      <div class="lesson-example-wrap">
+        <div class="lesson-example-label">Example</div>
+        <div id="lesson-example-editor"></div>
+      </div>
+      <ul id="lesson-points" class="lesson-points"></ul>
+      <button id="btn-start-challenge" class="btn-primary lesson-cta">Continue to Challenge →</button>
+    </div>
+  </section>
+
   <!-- ============== CHALLENGE SCREEN ============== -->
   <section id="screen-challenge" class="screen">
     <button class="btn-back" data-action="to-location">&larr; Back</button>
@@ -107,6 +123,7 @@
     <div class="challenge-controls">
       <button id="btn-run" class="btn-primary">▶ Run Code</button>
       <button id="btn-hint" class="btn-ghost">💡 Hint (<span id="hint-count">0</span>/<span id="hint-max">0</span>)</button>
+      <button id="btn-view-lesson" class="btn-ghost">📘 Review Lesson</button>
       <span id="run-status" class="run-status"></span>
     </div>
 

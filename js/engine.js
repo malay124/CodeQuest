@@ -12,6 +12,7 @@ let currentRegionId = null;
 /* ---------- Code editor (CodeMirror, with a plain-textarea fallback) ---------- */
 
 let cmEditor = null;
+let lessonCmEditor = null;
 function initEditor() {
   const textarea = document.getElementById("code-editor");
   if (typeof CodeMirror === "undefined") return; // offline fallback: plain textarea still works
@@ -28,6 +29,15 @@ function initEditor() {
     extraKeys: {
       Tab: (cm) => cm.replaceSelection("    ", "end"),
     },
+  });
+
+  lessonCmEditor = CodeMirror(document.getElementById("lesson-example-editor"), {
+    mode: "python",
+    lineNumbers: false,
+    readOnly: true,
+    lineWrapping: true,
+    scrollbarStyle: "null",
+    cursorBlinkRate: -1,
   });
 }
 function getEditorValue() {
@@ -329,13 +339,47 @@ function renderQuestList(loc) {
       <div class="quest-status">${status}</div>
     `;
     if (available || done) {
-      row.addEventListener("click", () => openChallenge(qid));
+      row.addEventListener("click", () => openLesson(qid, "location"));
     } else {
       row.style.opacity = "0.55";
       row.style.cursor = "not-allowed";
     }
     list.appendChild(row);
   });
+}
+
+/* ---------- Lesson Screen ---------- */
+
+let lessonOrigin = "location"; // "location" | "skilltree" | "challenge"
+
+function openLesson(questId, origin) {
+  currentQuestId = questId;
+  if (origin) lessonOrigin = origin;
+  const quest = QUESTS[questId];
+  const lesson = quest.lesson;
+
+  document.getElementById("lesson-title").textContent = lesson.title;
+  document.getElementById("lesson-body").textContent = lesson.body;
+
+  const pointsList = document.getElementById("lesson-points");
+  pointsList.innerHTML = lesson.points.map((p) => `<li>${escapeHtml(p)}</li>`).join("");
+
+  if (lessonCmEditor) {
+    lessonCmEditor.setValue(lesson.example);
+  }
+
+  showScreen("screen-lesson");
+  if (lessonCmEditor) setTimeout(() => lessonCmEditor.refresh(), 0);
+}
+
+function lessonBack() {
+  if (lessonOrigin === "skilltree") {
+    openSkillTree();
+  } else if (lessonOrigin === "challenge") {
+    openChallenge(currentQuestId);
+  } else {
+    openLocation(currentLocationId);
+  }
 }
 
 /* ---------- Challenge Screen ---------- */
@@ -544,7 +588,7 @@ function renderSkillTree() {
   canvas.querySelectorAll(".skill-node.available").forEach((node) => {
     node.addEventListener("click", () => {
       const questId = node.getAttribute("data-quest");
-      if (questId) openChallenge(questId);
+      if (questId) openLesson(questId, "skilltree");
     });
   });
 }
@@ -626,6 +670,9 @@ document.getElementById("btn-skilltree").addEventListener("click", openSkillTree
 document.getElementById("btn-journal").addEventListener("click", openJournal);
 document.getElementById("btn-run").addEventListener("click", handleRunCode);
 document.getElementById("btn-hint").addEventListener("click", handleRevealHint);
+document.getElementById("btn-lesson-back").addEventListener("click", lessonBack);
+document.getElementById("btn-start-challenge").addEventListener("click", () => openChallenge(currentQuestId));
+document.getElementById("btn-view-lesson").addEventListener("click", () => openLesson(currentQuestId, "challenge"));
 
 document.getElementById("btn-new-game").addEventListener("click", startNewGame);
 document.getElementById("btn-continue").addEventListener("click", continueGame);

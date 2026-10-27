@@ -466,6 +466,12 @@ const LOCATIONS = [
 const QUESTS = {
   "q.village.variables": {
     id: "q.village.variables",
+    lesson: {
+      title: "Variables",
+      body: "A variable is a named box that holds a value. In Python you create one simply by writing `name = value` — no special keyword needed. Once assigned, you can use the variable anywhere by its name, and reassign it later to change what it holds.",
+      example: "# Create a variable and use it\nhealth = 100\nprint(health)        # 100\n\nhealth = 80           # reassign it\nprint(health)        # 80",
+      points: ["= assigns a value to a name","A variable can hold numbers, text, or anything else","You can change what a variable holds at any time"],
+    },
     title: "Name a Value",
     skill: "skill.variables",
     location: "loc.village",
@@ -491,6 +497,12 @@ const QUESTS = {
 
   "q.village.types": {
     id: "q.village.types",
+    lesson: {
+      title: "Data Types",
+      body: "Every value in Python has a type — `int` for whole numbers, `float` for decimals, `str` for text, and `bool` for True/False. The built-in `type()` function tells you a value's type, and `type(x).__name__` turns that into a readable string.",
+      example: "print(type(5))           # <class 'int'>\nprint(type(5.0))          # <class 'float'>\nprint(type(\"hi\"))          # <class 'str'>\nprint(type(True))           # <class 'bool'>\nprint(type(5).__name__)      # 'int'",
+      points: ["int, float, str, bool are the basic types","type(x) inspects a value's type",".__name__ turns a type into a plain string"],
+    },
     title: "Shape of Data",
     skill: "skill.types",
     location: "loc.village",
@@ -519,6 +531,12 @@ const QUESTS = {
 
   "q.village.io": {
     id: "q.village.io",
+    lesson: {
+      title: "Print & f-strings",
+      body: "`print()` displays text on the screen. An f-string (a string starting with `f`) lets you weave variable values directly into text using `{}` — the main way a Python program talks to the people using it.",
+      example: "name = \"Ada\"\nprint(f\"Hello, {name}!\")   # Hello, Ada!",
+      points: ["print(x) outputs x to the screen","f\"...{var}...\" embeds a variable's value","Anything inside {} is evaluated as Python"],
+    },
     title: "Speak & Listen",
     skill: "skill.io",
     location: "loc.village",
@@ -552,6 +570,12 @@ const QUESTS = {
 
   "q.potion.arithmetic": {
     id: "q.potion.arithmetic",
+    lesson: {
+      title: "Arithmetic Operators",
+      body: "Python supports the usual math operators: `+ - * /` for addition, subtraction, multiplication and division, plus `//` for floor (whole-number) division and `%` for the remainder. They follow the normal order of operations, and parentheses can override it.",
+      example: "print(3 + 2 * 4)   # 11  (multiplication happens first)\nprint(7 // 2)        # 3   (floor division)\nprint(7 % 2)           # 1   (remainder)",
+      points: ["Normal math order applies: * / before + -","// gives a whole number, % gives the remainder","Parentheses () control the order explicitly"],
+    },
     title: "Measure the Brew",
     skill: "skill.arithmetic",
     location: "loc.potionhut",
@@ -578,6 +602,12 @@ const QUESTS = {
 
   "q.potion.strings": {
     id: "q.potion.strings",
+    lesson: {
+      title: "String Concatenation",
+      body: "Strings can be joined together with the `+` operator, just like numbers are added — this is called concatenation. Python won't silently convert a number to text for you though: mixing `str + int` raises an error.",
+      example: "greeting = \"Hello, \" + \"world\" + \"!\"\nprint(greeting)   # Hello, world!",
+      points: ["+ joins strings end-to-end","Spaces and punctuation must be included explicitly","str + int raises a TypeError — convert first with str(x)"],
+    },
     title: "Bind Words Together",
     skill: "skill.strings",
     location: "loc.potionhut",
@@ -611,6 +641,12 @@ const QUESTS = {
 
   "q.potion.fstrings": {
     id: "q.potion.fstrings",
+    lesson: {
+      title: "f-strings in Depth",
+      body: "f-strings are the modern, preferred way to build strings that include variables. Put any variable — or even a whole expression — inside `{}` and Python converts it to text automatically, no `+` needed.",
+      example: "name = \"Rin\"\nlevel = 5\nprint(f\"{name} is level {level}.\")   # Rin is level 5.\nprint(f\"Double: {level * 2}\")          # Double: 10",
+      points: ["{} can hold a variable or any expression","No manual type conversion needed","Cleaner than chaining + for every piece"],
+    },
     title: "Whisper of Formatting",
     skill: "skill.fstrings",
     location: "loc.potionhut",
@@ -644,6 +680,12 @@ const QUESTS = {
 
   "q.market.inventory": {
     id: "q.market.inventory",
+    lesson: {
+      title: "Mixing Numbers",
+      body: "Multiplying two numbers in Python works the same whether they're whole numbers (`int`) or decimals (`float`) — the result automatically becomes a `float` if either input is a float.",
+      example: "print(3 * 2.5)   # 7.5\nprint(3 * 2)        # 6",
+      points: ["int * float → float automatically","No casting needed for basic math","The result's type depends on its inputs"],
+    },
     title: "Balance the Ledger",
     skill: null,
     location: "loc.market",
@@ -669,6 +711,12 @@ const QUESTS = {
 
   "q.oracle.datascience": {
     id: "q.oracle.datascience",
+    lesson: {
+      title: "A First Taste of Data Science",
+      body: "Data science starts with simple math on collections of numbers. The average (mean) is the sum divided by the count. A simple predictive model can be as plain as a straight line: `output = weight × input + bias`. Turning a numeric prediction into a decision just means comparing it to a threshold.",
+      example: "values = [2, 4, 6]\naverage = sum(values) / len(values)\nprint(average)   # 4.0",
+      points: ["mean = sum(values) / len(values)","A linear model is just weight * x + bias","A threshold turns a number into a yes/no decision"],
+    },
     title: "Teach the Oracle to See",
     skill: null,
     location: "loc.scryingpool",
@@ -718,6 +766,12 @@ def classify(prediction, threshold):
 
   "boss.mimic-merchant": {
     id: "boss.mimic-merchant",
+    lesson: {
+      title: "Review: The Verdant Vale",
+      body: "This boss combines everything from the Verdant Vale. Create variables with `=`, build text with f-strings `{}`, and combine numbers with `+ - * / // %`. If a hint stumps you, it's worth revisiting the quest where you first learned that skill.",
+      example: "name = \"Ada\"\ncharges = 3\nprint(f\"{name}'s ward holds for {charges} charges.\")\nprint(charges + 2)   # 5",
+      points: ["f-strings for building sentences","Plain arithmetic for combining numbers","Multiple functions can be defined in one file"],
+    },
     title: "Boss: The Mimic Merchant",
     skill: null,
     location: "loc.forestedge",
@@ -772,6 +826,12 @@ def recharge(charges, amount):
 
   "q.logic.ifelse": {
     id: "q.logic.ifelse",
+    lesson: {
+      title: "if / elif / else",
+      body: "`if` / `elif` / `else` lets your program choose between different paths based on a condition. Python checks each condition top to bottom and runs the FIRST branch whose condition is True; if none match, it falls through to `else`.",
+      example: "age = 15\nif age < 13:\n    print(\"child\")\nelif age < 20:\n    print(\"teen\")     # this one runs\nelse:\n    print(\"adult\")",
+      points: ["Conditions are checked in order, top to bottom","Only the first True branch runs","else catches everything else"],
+    },
     title: "Choose a Path",
     skill: "skill.ifelse",
     location: "loc.crossroads",
@@ -800,6 +860,12 @@ def recharge(charges, amount):
 
   "q.logic.comparisons": {
     id: "q.logic.comparisons",
+    lesson: {
+      title: "Comparison Operators",
+      body: "Comparison operators compare two values and produce a boolean (`True`/`False`): `>` greater than, `<` less than, `==` equal, `!=` not equal, `>=` and `<=` for greater/less-or-equal. Note `==` compares values — `=` assigns one.",
+      example: "print(5 > 3)    # True\nprint(5 == 5)     # True\nprint(5 != 3)       # True",
+      points: ["== compares, = assigns — easy to mix up!","Comparisons always produce True or False",">= and <= include the equal case"],
+    },
     title: "Measure the Gap",
     skill: "skill.comparisons",
     location: "loc.crossroads",
@@ -826,6 +892,12 @@ def recharge(charges, amount):
 
   "q.logic.nested": {
     id: "q.logic.nested",
+    lesson: {
+      title: "Nested & Chained Conditionals",
+      body: "Conditions can be nested or chained with `elif` to check multiple things in sequence. The first True branch wins — later checks only run if the earlier ones were False.",
+      example: "has_key = False\nis_friend = True\nif has_key:\n    print(\"enter\")\nelif is_friend:\n    print(\"welcome\")    # this one runs\nelse:\n    print(\"denied\")",
+      points: ["elif chains let you check several conditions in order","Priority matters: put the most important check first","Only one branch ever runs"],
+    },
     title: "Guarded Door",
     skill: "skill.nested",
     location: "loc.crossroads",
@@ -856,6 +928,12 @@ def recharge(charges, amount):
 
   "q.logic.and": {
     id: "q.logic.and",
+    lesson: {
+      title: "The `and` Operator",
+      body: "`and` combines two boolean conditions: the result is `True` only when BOTH sides are `True`. It's how you require multiple things to be true at once.",
+      example: "print(True and True)    # True\nprint(True and False)     # False",
+      points: ["Both sides must be True for the result to be True","Common for combining requirements, like has_key and has_password"],
+    },
     title: "Bind Two Truths",
     skill: "skill.and",
     location: "loc.mirrorhall",
@@ -882,6 +960,12 @@ def recharge(charges, amount):
 
   "q.logic.or_not": {
     id: "q.logic.or_not",
+    lesson: {
+      title: "The `or` and `not` Operators",
+      body: "`or` is `True` when AT LEAST ONE side is `True`. `not` flips a boolean to its opposite — `not True` is `False`, `not False` is `True`.",
+      example: "print(True or False)   # True\nprint(not True)           # False",
+      points: ["or needs only one side to be True","not inverts a single boolean","and/or/not combine to express any logic"],
+    },
     title: "Either Will Do",
     skill: "skill.or_not",
     location: "loc.mirrorhall",
@@ -916,6 +1000,12 @@ def negate(flag):
 
   "boss.gatekeeper": {
     id: "boss.gatekeeper",
+    lesson: {
+      title: "Review: The Logic Labyrinth",
+      body: "This boss combines comparisons, `and`, and nested conditionals. Check the most important condition first (like a ban), then use `and` to require multiple things together, then fall back to a default case.",
+      example: "is_banned = False\nage, has_pass = 25, True\nif is_banned:\n    print(\"turned away\")\nelif age >= 18 and has_pass:\n    print(\"admitted\")       # this one runs\nelse:\n    print(\"needs escort\")",
+      points: ["Order conditions by priority","and combines multiple requirements","A final else is your safety net"],
+    },
     title: "Boss: The Gatekeeper",
     skill: null,
     location: "loc.vault",
@@ -954,6 +1044,12 @@ def negate(flag):
 
   "q.loop.for_sum": {
     id: "q.loop.for_sum",
+    lesson: {
+      title: "for Loops",
+      body: "A `for` loop repeats a block of code once for every item in a sequence (like a list). `for item in a_list:` runs the indented body with `item` set to each value in turn — perfect for totals, counting, and processing collections.",
+      example: "total = 0\nfor n in [1, 2, 3]:\n    total += n\nprint(total)   # 6",
+      points: ["for item in sequence: runs once per item","+= adds to a running total each time","The loop body must be indented"],
+    },
     title: "Count the Logs",
     skill: "skill.for_loop",
     location: "loc.lumbercamp",
@@ -981,6 +1077,12 @@ def negate(flag):
 
   "q.loop.while_count": {
     id: "q.loop.while_count",
+    lesson: {
+      title: "while Loops",
+      body: "A `while` loop repeats as long as its condition stays `True`. Unlike a `for` loop (which runs once per item in a known collection), you control exactly when a `while` loop stops — just remember to change something inside the loop, or it will run forever.",
+      example: "n = 3\nresult = []\nwhile n > 0:\n    result.append(n)\n    n -= 1\nprint(result)   # [3, 2, 1]",
+      points: ["while condition: repeats until the condition is False","Something inside the loop must eventually make the condition False","Good for 'repeat until' situations, not just 'for each item'"],
+    },
     title: "Watch the Gate",
     skill: "skill.while_loop",
     location: "loc.lumbercamp",
@@ -1008,6 +1110,12 @@ def negate(flag):
 
   "q.loop.list_basics": {
     id: "q.loop.list_basics",
+    lesson: {
+      title: "Lists & append()",
+      body: "A list is an ordered, changeable collection, written with square brackets `[]`. `.append(item)` adds a new item to the end of an existing list.",
+      example: "items = [\"rope\"]\nitems.append(\"torch\")\nprint(items)   # ['rope', 'torch']",
+      points: ["[] creates a list",".append(x) adds x to the end","Lists keep their order"],
+    },
     title: "Sort the Supplies",
     skill: "skill.list_basics",
     location: "loc.beastpens",
@@ -1033,6 +1141,12 @@ def negate(flag):
 
   "q.loop.dict_basics": {
     id: "q.loop.dict_basics",
+    lesson: {
+      title: "Dictionaries",
+      body: "A dictionary stores key→value pairs, written with curly braces: `{key: value}`. `.get(key, default)` safely reads a value, returning `default` if the key isn't present — ideal for tallying counts without crashing on a brand-new key.",
+      example: "counts = {}\nfor word in [\"cat\", \"dog\", \"cat\"]:\n    counts[word] = counts.get(word, 0) + 1\nprint(counts)   # {'cat': 2, 'dog': 1}",
+      points: ["{} with key: value pairs creates a dict",".get(key, default) never crashes on a missing key","A great pattern for counting/tallying"],
+    },
     title: "Tally the Beasts",
     skill: "skill.dict_basics",
     location: "loc.beastpens",
@@ -1067,6 +1181,12 @@ def negate(flag):
 
   "q.loop.listcomp": {
     id: "q.loop.listcomp",
+    lesson: {
+      title: "List Comprehensions",
+      body: "A list comprehension builds a new list in a single, readable line: `[expression for item in iterable]`. It's equivalent to a `for` loop that appends to a list, but more concise — experienced Python programmers use this constantly.",
+      example: "nums = [1, 2, 3]\ndoubled = [n * 2 for n in nums]\nprint(doubled)   # [2, 4, 6]",
+      points: ["[expr for item in iterable] builds a list in one line","Same idea as a for-loop + append, just shorter","Very common in real Python code"],
+    },
     title: "Swift Gathering",
     skill: "skill.listcomp",
     location: "loc.beastpens",
@@ -1093,6 +1213,12 @@ def negate(flag):
 
   "boss.hydra": {
     id: "boss.hydra",
+    lesson: {
+      title: "Review: The Looping Wilds",
+      body: "This boss combines dictionary tallying with a manual search loop. To find the dictionary entry with the highest value, loop over `.items()` and keep track of the best one seen so far — the same 'running best' pattern used for running totals.",
+      example: "counts = {\"fire\": 3, \"ice\": 1}\nbest_key, best_value = None, -1\nfor key, value in counts.items():\n    if value > best_value:\n        best_key, best_value = key, value\nprint(best_key)   # fire",
+      points: [".items() gives you (key, value) pairs to loop over","Track the 'best so far' as you go","This pattern works for max, min, or any custom comparison"],
+    },
     title: "Boss: The Infinite Hydra",
     skill: null,
     location: "loc.hydraslair",
@@ -1150,6 +1276,12 @@ def strongest(counts):
 
   "q.arch.function_basics": {
     id: "q.arch.function_basics",
+    lesson: {
+      title: "Functions & Default Parameters",
+      body: "A function is a reusable block of code defined with `def name(parameters):`. Parameters can have default values (`param=value`), which are used automatically when the caller doesn't supply that argument.",
+      example: "def greet(name, excited=False):\n    mark = \"!\" if excited else \".\"\n    return f\"Hi {name}{mark}\"\n\nprint(greet(\"Ada\"))          # Hi Ada.\nprint(greet(\"Ada\", True))      # Hi Ada!",
+      points: ["def name(params): defines a function","param=value gives a default, used if the caller omits it","return sends a value back to the caller"],
+    },
     title: "Forge a Tool",
     skill: "skill.function_basics",
     location: "loc.workshop",
@@ -1175,6 +1307,12 @@ def strongest(counts):
 
   "q.arch.multiple_returns": {
     id: "q.arch.multiple_returns",
+    lesson: {
+      title: "Returning Multiple Values",
+      body: "A function can return more than one value at once by separating them with commas — Python packs them into a tuple automatically. The caller can 'unpack' them straight back into separate variables using the same comma syntax.",
+      example: "def split(full):\n    first, last = full.split(\" \")\n    return first, last\n\nf, l = split(\"Ada Lovelace\")\nprint(f, l)   # Ada Lovelace",
+      points: ["return a, b packs two values into a tuple","x, y = some_tuple unpacks it back into two variables",".split(' ') breaks a string apart at each space"],
+    },
     title: "Twin Blades",
     skill: "skill.multiple_returns",
     location: "loc.workshop",
@@ -1200,6 +1338,12 @@ def strongest(counts):
 
   "q.arch.args_kwargs": {
     id: "q.arch.args_kwargs",
+    lesson: {
+      title: "*args — Variable Arguments",
+      body: "`*args` in a function signature collects any number of positional arguments into a tuple, so the function can accept a variable amount of input. Inside the function, that collected value behaves just like any tuple — you can sum it, loop over it, and so on.",
+      example: "def total(*numbers):\n    return sum(numbers)\n\nprint(total(1, 2, 3))   # 6\nprint(total(5))            # 5",
+      points: ["*name collects extra positional args into a tuple","Works with any number of arguments, including zero","sum() works on that tuple just like a list"],
+    },
     title: "Gather the Party",
     skill: "skill.args_kwargs",
     location: "loc.workshop",
@@ -1226,6 +1370,12 @@ def strongest(counts):
 
   "q.arch.recursion": {
     id: "q.arch.recursion",
+    lesson: {
+      title: "Recursion",
+      body: "A recursive function calls itself to solve a smaller version of the same problem, until it reaches a 'base case' that stops the recursion. Every recursive function needs that base case, or it will call itself forever.",
+      example: "def factorial(n):\n    if n == 0:\n        return 1                      # base case\n    return n * factorial(n - 1)        # recursive case\n\nprint(factorial(4))   # 24",
+      points: ["Every recursive function needs a base case to stop","The recursive case calls the function on a smaller input","Each call waits for the smaller call to finish first"],
+    },
     title: "Echoing Halls",
     skill: "skill.recursion",
     location: "loc.library",
@@ -1255,6 +1405,12 @@ def strongest(counts):
 
   "q.arch.debugging": {
     id: "q.arch.debugging",
+    lesson: {
+      title: "Reading & Fixing Bugs",
+      body: "Debugging means reading code carefully and tracing through it step by step with real values, rather than guessing. A classic bug is overwriting a running total instead of accumulating into it — always ask: 'what does this variable hold right before the bug shows up?'",
+      example: "# Buggy: overwrites instead of accumulating\ntotal = 0\nfor n in [1, 2, 3]:\n    total = n          # bug! should be +=\nprint(total)   # 3, not 6\n\n# Fixed:\ntotal = 0\nfor n in [1, 2, 3]:\n    total += n          # accumulates\nprint(total)   # 6",
+      points: ["Trace through code with real example values","= replaces a value, += accumulates onto it","Compare the buggy line to a working example you've seen before"],
+    },
     title: "Fix the Golem",
     skill: "skill.debugging",
     location: "loc.library",
@@ -1283,6 +1439,12 @@ def strongest(counts):
 
   "boss.golem": {
     id: "boss.golem",
+    lesson: {
+      title: "Review: The Architect's Spire",
+      body: "This boss combines a default parameter with `*args`. Build each piece with a familiar function shape, then sum up any number of values the same way `total_power()` did earlier in the Spire.",
+      example: "def build_part(name, strength=10):\n    return f\"{name}: {strength}\"\n\ndef total_strength(*parts):\n    return sum(parts)\n\nprint(build_part(\"Arm\"))          # Arm: 10\nprint(total_strength(10, 25, 5))    # 40",
+      points: ["Default parameters make arguments optional","*args handles any number of inputs","Two independent functions can reuse the same ideas"],
+    },
     title: "Boss: The Broken Golem",
     skill: null,
     location: "loc.golemyard",
@@ -1323,6 +1485,12 @@ def total_strength(*parts):
 
   "q.data.tryexcept": {
     id: "q.data.tryexcept",
+    lesson: {
+      title: "try / except",
+      body: "`try` / `except` lets your program handle errors gracefully instead of crashing. Python runs the `try` block; if a specific exception (like `ZeroDivisionError`) occurs, it jumps to the matching `except` block instead of stopping the program.",
+      example: "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    result = \"undefined\"\nprint(result)   # undefined",
+      points: ["try: wraps code that might fail","except ErrorType: catches that specific error","The program keeps running instead of crashing"],
+    },
     title: "Guard Against Chaos",
     skill: "skill.tryexcept",
     location: "loc.archivevault",
@@ -1349,6 +1517,12 @@ def total_strength(*parts):
 
   "q.data.keyerror": {
     id: "q.data.keyerror",
+    lesson: {
+      title: "Safe Dictionary Access",
+      body: "Accessing a missing dictionary key with `record[key]` raises a `KeyError` and crashes your program. `.get(key, default)` is the safe alternative — it returns `default` instead of crashing when the key isn't there.",
+      example: "record = {\"name\": \"Ada\"}\nprint(record.get(\"name\", \"missing\"))   # Ada\nprint(record.get(\"age\", \"missing\"))     # missing",
+      points: ["record[key] crashes if the key is missing",".get(key, default) never crashes","Great for data that might have gaps"],
+    },
     title: "Read the Scroll",
     skill: "skill.keyerror",
     location: "loc.archivevault",
@@ -1375,6 +1549,12 @@ def total_strength(*parts):
 
   "q.data.json": {
     id: "q.data.json",
+    lesson: {
+      title: "JSON Parsing",
+      body: "JSON is a text format for structured data, used everywhere data moves between programs (APIs, config files, saved files, and more). Python's `json` module converts between JSON text and Python objects: `json.loads(text)` parses JSON into a dict, and `json.dumps(obj)` does the reverse.",
+      example: "import json\ntext = '{\"title\": \"Map\", \"pages\": 3}'\ndata = json.loads(text)\nprint(data[\"title\"])   # Map",
+      points: ["json.loads(text) turns JSON text into a Python dict","json.dumps(obj) turns a Python object back into JSON text","Once parsed, it's just a normal dict"],
+    },
     title: "Decode the Archive",
     skill: "skill.json",
     location: "loc.recordshall",
@@ -1411,6 +1591,12 @@ def parse_title(json_string):
 
   "q.data.class_basics": {
     id: "q.data.class_basics",
+    lesson: {
+      title: "Classes & Objects",
+      body: "A class is a blueprint for creating objects that bundle data and behavior together. `__init__(self, ...)` runs automatically when you create a new object and sets up its starting attributes (stored as `self.attribute`). Other methods can then read and use those attributes.",
+      example: "class Scroll:\n    def __init__(self, title, pages):\n        self.title = title\n        self.pages = pages\n\n    def summary(self):\n        return f\"{self.title} ({self.pages} pages)\"\n\ns = Scroll(\"Map\", 3)\nprint(s.summary())   # Map (3 pages)",
+      points: ["__init__ runs when an object is created","self.x stores data on that specific object","Methods are just functions defined inside the class"],
+    },
     title: "Build a Construct",
     skill: "skill.class_basics",
     location: "loc.recordshall",
@@ -1451,6 +1637,12 @@ def parse_title(json_string):
 
   "q.data.listofdicts": {
     id: "q.data.listofdicts",
+    lesson: {
+      title: "Searching Structured Data",
+      body: "Real-world data is often a list of dictionaries — think of it as a table of records. To find one, loop through the list and check each record's field; return as soon as you find a match, or `None` if you reach the end without one.",
+      example: "records = [{\"name\": \"Ada\"}, {\"name\": \"Rin\"}]\nfor r in records:\n    if r[\"name\"] == \"Rin\":\n        print(r)   # {'name': 'Rin'}\n        break",
+      points: ["A list of dicts is like a table of rows","Loop and check a field to search it","Return None (implicitly, after the loop) when nothing matches"],
+    },
     title: "Cross-Reference the Records",
     skill: "skill.listofdicts",
     location: "loc.recordshall",
@@ -1486,6 +1678,12 @@ def parse_title(json_string):
 
   "boss.archivist": {
     id: "boss.archivist",
+    lesson: {
+      title: "Review: The Data Dunes",
+      body: "This boss combines error handling with JSON parsing and safe dictionary access. Wrap risky parsing in `try`/`except`, and use `.get(key, default)` so a missing field never crashes the whole operation.",
+      example: "import json\ntry:\n    data = json.loads(\"not valid json{{{\")\nexcept Exception:\n    data = {\"error\": \"corrupted\"}\nprint(data)   # {'error': 'corrupted'}",
+      points: ["Catching a bare Exception covers any parse failure",".get() with a default keeps missing fields from crashing you","Combine small safe patterns to build a robust pipeline"],
+    },
     title: "Boss: The Archivist",
     skill: null,
     location: "loc.archivistchamber",
@@ -1543,6 +1741,12 @@ def extract_titles(records):
 
   "q.ai.numpy_array": {
     id: "q.ai.numpy_array",
+    lesson: {
+      title: "NumPy Arrays",
+      body: "NumPy is the foundational library for numerical computing in Python — almost every data science and machine learning tool is built on it. A NumPy array (created with `np.array()`) lets you apply math to an entire collection of numbers at once, much faster than a plain Python loop.",
+      example: "import numpy as np\narr = np.array([1, 2, 3])\nprint(arr.sum())             # 6\nprint(float(arr.sum()))        # 6.0",
+      points: ["np.array(list) creates a NumPy array","Arrays support whole-collection math operations","Convert results with float()/int()/.tolist() for plain Python values"],
+    },
     title: "Summon the Array",
     skill: "skill.numpy_array",
     location: "loc.observatory",
@@ -1573,6 +1777,12 @@ def array_sum(values):
 
   "q.ai.numpy_stats": {
     id: "q.ai.numpy_stats",
+    lesson: {
+      title: "Mean & Standard Deviation",
+      body: "Before modeling data, data scientists describe it. `np.mean()` computes the average, and `np.std()` computes the standard deviation — a measure of how spread out the values are. Together they're the starting point of almost every data analysis.",
+      example: "import numpy as np\ndata = np.array([2, 4, 4, 4, 5, 5, 7, 9])\nprint(np.mean(data))   # 5.0\nprint(np.std(data))      # 2.0",
+      points: ["np.mean() is the average of all values","np.std() measures how spread out the values are","A std of 0 means every value is identical"],
+    },
     title: "Measure the Cosmos",
     skill: "skill.numpy_stats",
     location: "loc.observatory",
@@ -1602,6 +1812,12 @@ def stats(values):
 
   "q.ai.vectorized_ops": {
     id: "q.ai.vectorized_ops",
+    lesson: {
+      title: "Vectorization & Feature Scaling",
+      body: "NumPy lets you apply an operation to an entire array at once ('vectorization') instead of looping — `(arr - mean) / std` runs on every element simultaneously. This specific operation is called standardization, and it's one of the first things done to data before training a model.",
+      example: "import numpy as np\narr = np.array([3, 5])\nmean, std = np.mean(arr), np.std(arr)\nprint(((arr - mean) / std).tolist())   # [-1.0, 1.0]",
+      points: ["Arithmetic on an array applies to every element at once","Standardizing puts different features on the same scale",".tolist() converts a NumPy array back to a plain Python list"],
+    },
     title: "Align the Stars",
     skill: "skill.vectorized_ops",
     location: "loc.observatory",
@@ -1635,6 +1851,12 @@ def normalize(values):
 
   "q.ai.gradient_step": {
     id: "q.ai.gradient_step",
+    lesson: {
+      title: "Gradient Descent",
+      body: "Gradient descent is how most machine learning models learn: given a prediction's error, nudge the model's parameters (weight and bias) a little in the direction that reduces that error. Repeating this update many times, across many examples, is literally what 'training a model' means under the hood.",
+      example: "def gradient_step(x, y, weight, bias, lr):\n    prediction = weight * x + bias\n    error = prediction - y\n    new_weight = weight - lr * 2 * error * x\n    new_bias = bias - lr * 2 * error\n    return new_weight, new_bias\n\nprint(gradient_step(2, 5, 1, 0, 0.1))   # (2.2, 0.6)",
+      points: ["error = prediction - actual","The update nudges weight/bias opposite the error's direction","lr (learning rate) controls how big each nudge is"],
+    },
     title: "Train the Oracle",
     skill: "skill.gradient_step",
     location: "loc.forgeofmodels",
@@ -1671,6 +1893,12 @@ def normalize(values):
 
   "q.ai.accuracy": {
     id: "q.ai.accuracy",
+    lesson: {
+      title: "Evaluation Metrics: Accuracy",
+      body: "A trained model is only useful if you can measure how good it is. Accuracy — the fraction of predictions that exactly match the real answer — is the simplest and most common evaluation metric for classification.",
+      example: "preds =  [1, 0, 1, 1]\nactual = [1, 0, 0, 1]\ncorrect = sum(1 for p, a in zip(preds, actual) if p == a)\nprint(correct / len(preds))   # 0.75",
+      points: ["accuracy = correct predictions / total predictions","zip() pairs up two lists element by element","A generator expression like sum(1 for ... if ...) counts matches"],
+    },
     title: "Judge the Prophecy",
     skill: "skill.accuracy",
     location: "loc.forgeofmodels",
@@ -1698,6 +1926,12 @@ def normalize(values):
 
   "boss.oracle": {
     id: "boss.oracle",
+    lesson: {
+      title: "Review: Training a Real Model",
+      body: "Training a model for real means repeating the gradient-descent update across your whole dataset, multiple times — each full pass through all the data is called an 'epoch'. Once trained, making a prediction is just plugging a new x into `weight * x + bias`.",
+      example: "# One epoch = one pass through ALL the data\nfor x, y in zip(xs, ys):\n    weight, bias = gradient_step(x, y, weight, bias, lr)\n# Repeat for many epochs to let it converge",
+      points: ["An epoch is one full pass over the training data","More epochs (usually) means a better-fit model","Prediction, after training, is just weight * x + bias"],
+    },
     title: "Boss: The Oracle",
     skill: null,
     location: "loc.oraclesanctum",
