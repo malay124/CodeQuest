@@ -1,11 +1,14 @@
 /* ============================================================
    Python Challenge Runner
    Runs the player's real Python code in the browser via Pyodide
-   and checks it against each quest's test cases.
+   and checks it against each quest's test cases. Supports quests
+   that rely on real scientific-computing packages (e.g. numpy),
+   loaded on demand via quest.pyPackages.
    ============================================================ */
 
 let _pyodideInstance = null;
 let _pyodideLoading = null;
+const _loadedPackages = new Set();
 
 /** Lazily load Pyodide once, and reuse the same instance after that. */
 function getPyodide(onStatus) {
@@ -22,25 +25,48 @@ function getPyodide(onStatus) {
   return _pyodideLoading;
 }
 
+async function ensurePackages(pyodide, packages, onStatus) {
+  const missing = (packages || []).filter((p) => !_loadedPackages.has(p));
+  if (missing.length === 0) return;
+  onStatus && onStatus(`Loading ${missing.join(", ")} (first time only)...`);
+  await pyodide.loadPackage(missing);
+  missing.forEach((p) => _loadedPackages.add(p));
+}
+
 /**
  * Run the player's code against a quest's test cases.
  * @param {string} userCode - the full Python source the player wrote.
- * @param {Array} tests - [{ call, expected, desc }]
+ * @param {object} quest - the quest object (uses .tests and optional .pyPackages)
  * @param {function} onStatus - optional progress callback
  * @returns {Promise<{ passed: boolean, results: Array }>}
  */
-async function runChallenge(userCode, tests, onStatus) {
+async function runChallenge(userCode, quest, onStatus) {
   const pyodide = await getPyodide(onStatus);
+  if (quest.pyPackages && quest.pyPackages.length) {
+    await ensurePackages(pyodide, quest.pyPackages, onStatus);
+  }
+
   const results = [];
 
-  for (const test of tests) {
+  for (const test of quest.tests) {
     const harness = `
 import json as __cq_json
+
+def __cq_default(o):
+    # Make numpy/pandas return values JSON-serializable without the
+    # player needing to think about it.
+    if hasattr(o, "tolist"):
+        return o.tolist()
+    if hasattr(o, "item"):
+        return o.item()
+    if hasattr(o, "to_dict"):
+        return o.to_dict()
+    raise TypeError(f"Object of type {type(o)} is not JSON serializable")
 
 def __cq_run():
     try:
         __cq_value = (${test.call})
-        return __cq_json.dumps({"ok": True, "value": __cq_value})
+        return __cq_json.dumps({"ok": True, "value": __cq_value}, default=__cq_default)
     except Exception as __cq_e:
         return __cq_json.dumps({"ok": False, "error": f"{type(__cq_e).__name__}: {__cq_e}"})
 
@@ -56,7 +82,7 @@ __cq_run()
       globals.destroy();
       outcome = JSON.parse(resultStr);
     } catch (err) {
-      // Syntax errors or other failures surfaced directly by Pyodide.
+      // Syntax errors, non-JSON-safe values (e.g. NaN), or other failures.
       outcome = { ok: false, error: formatPyError(err) };
     }
 
@@ -78,11 +104,22 @@ __cq_run()
   return { passed, results };
 }
 
+/** Deep equality with a float tolerance, so numpy/float-math results
+ *  aren't rejected over last-digit rounding differences. */
 function valuesEqual(a, b) {
   if (typeof a === "number" && typeof b === "number") {
-    return Math.abs(a - b) < 1e-9;
+    return Math.abs(a - b) < 1e-6;
   }
-  return JSON.stringify(a) === JSON.stringify(b);
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((v, i) => valuesEqual(v, b[i]));
+  }
+  if (a && b && typeof a === "object" && typeof b === "object") {
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every((k) => Object.prototype.hasOwnProperty.call(b, k) && valuesEqual(a[k], b[k]));
+  }
+  return a === b;
 }
 
 function formatPyError(err) {

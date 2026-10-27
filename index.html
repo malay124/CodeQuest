@@ -8,20 +8,49 @@
 </head>
 <body>
 
-<header id="topbar">
+<header id="topbar" class="hidden">
   <div id="topbar-title">🗺️ CodeQuest <span class="subtitle">The World of Code</span></div>
   <div id="topbar-stats">
-    <span id="stat-skills">Skills: 0/8</span>
-    <span id="stat-quests">Quests: 0/7</span>
+    <span id="stat-skills">Skills: 0/31</span>
+    <span id="stat-quests">Quests: 0/39</span>
     <button id="btn-journal" class="btn-ghost">📖 Journal</button>
+    <button id="btn-title" class="btn-ghost">🏠 Title</button>
     <button id="btn-reset" class="btn-ghost danger">⟲ Reset</button>
   </div>
 </header>
 
 <main id="app">
 
+  <!-- ============== TITLE SCREEN ============== -->
+  <section id="screen-title" class="screen active">
+    <div class="title-screen">
+      <div class="title-emblem">🗺️</div>
+      <h1 class="title-heading">CodeQuest</h1>
+      <p class="title-subheading">The World of Code</p>
+      <p class="title-tagline">Learn real Python — from your first variable to building and evaluating your own machine-learning model — by exploring a world, talking to its people, and writing the code that saves it.</p>
+      <div class="title-menu">
+        <button id="btn-new-game" class="btn-primary title-btn">New Game</button>
+        <button id="btn-continue" class="btn-ghost title-btn">Continue Saved Game</button>
+        <button id="btn-exit" class="btn-ghost title-btn danger">Exit App</button>
+      </div>
+      <p id="title-save-info" class="title-save-info"></p>
+    </div>
+  </section>
+
+  <!-- ============== EXIT SCREEN ============== -->
+  <section id="screen-exit" class="screen">
+    <div class="title-screen">
+      <div class="title-emblem">👋</div>
+      <h1 class="title-heading">Farewell, Traveler</h1>
+      <p class="title-tagline">Your progress is saved. You may close this tab now, or return to the title screen.</p>
+      <div class="title-menu">
+        <button id="btn-exit-back" class="btn-ghost title-btn">Return to Title</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ============== WORLD MAP SCREEN ============== -->
-  <section id="screen-map" class="screen active">
+  <section id="screen-map" class="screen">
     <h1 class="screen-title">The World of Code</h1>
     <p class="screen-sub">Choose a region to explore. Locked lands reveal what you must master first.</p>
     <div id="map-canvas"></div>
@@ -77,7 +106,7 @@
   <!-- ============== SKILL TREE SCREEN ============== -->
   <section id="screen-skilltree" class="screen">
     <button class="btn-back" data-action="to-region">&larr; Back</button>
-    <h1 class="screen-title">Verdant Vale Skill Tree</h1>
+    <h1 id="skilltree-title" class="screen-title">Skill Tree</h1>
     <p class="screen-sub">Each branch unlocks in order. Complete a quest to master its skill.</p>
     <div id="skilltree-canvas" class="skilltree-canvas"></div>
   </section>

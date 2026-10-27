@@ -1,17 +1,33 @@
 /* ============================================================
    CodeQuest Engine
-   Screen routing, skill-tree logic, quest/challenge flow.
+   Title screen, screen routing, skill-tree logic, quest/challenge flow.
+   Supports any number of regions, driven entirely by data.js.
    ============================================================ */
 
 let SAVE = loadSave();
 let currentQuestId = null;
 let currentLocationId = null;
-const CURRENT_REGION = "verdant-vale"; // V1 scope: only region fully built
+let currentRegionId = null;
 
 /* ---------- Derived game state helpers ---------- */
 
+function regionById(id) {
+  return REGIONS.find((r) => r.id === id);
+}
+function locationById(id) {
+  return LOCATIONS.find((l) => l.id === id);
+}
 function skillById(id) {
   return SKILLS.find((s) => s.id === id);
+}
+function branchById(id) {
+  return BRANCHES.find((b) => b.id === id);
+}
+
+/** Which region a quest belongs to, derived from its location. */
+function questRegion(quest) {
+  const loc = locationById(quest.location);
+  return loc ? loc.region : null;
 }
 
 function isSkillMastered(id) {
@@ -22,7 +38,7 @@ function isSkillAvailable(id) {
   if (isSkillMastered(id)) return false;
   const skill = skillById(id);
   if (!skill) return false;
-  if (skill.regionLocked) return false; // these never become available in V1
+  if (skill.regionLocked) return false; // these never become available — real version lives in another region
   return skill.requires.every((req) => isSkillMastered(req));
 }
 
@@ -42,12 +58,13 @@ function isQuestAvailable(id) {
   const quest = QUESTS[id];
   if (!quest) return false;
   if (quest.isBoss) {
-    // Boss is available once every non-boss quest in the region is complete.
+    // A region's boss is available once every non-boss quest in THAT region is complete.
+    const region = questRegion(quest);
     return Object.values(QUESTS)
-      .filter((q) => !q.isBoss)
+      .filter((q) => !q.isBoss && questRegion(q) === region)
       .every((q) => isQuestCompleted(q.id));
   }
-  if (!quest.skill) return true; // side quests (e.g. market) have no prerequisite skill
+  if (!quest.skill) return true; // side quests (market, bonus) have no prerequisite skill
   const skill = skillById(quest.skill);
   return skill.requires.every((req) => isSkillMastered(req));
 }
@@ -68,6 +85,13 @@ function persist() {
   updateTopbarStats();
 }
 
+function hasAnyProgress(save) {
+  return (
+    (save.masteredSkills && save.masteredSkills.length > 0) ||
+    (save.completedQuests && save.completedQuests.length > 0)
+  );
+}
+
 /* ---------- Screen routing ---------- */
 
 function showScreen(id) {
@@ -81,6 +105,70 @@ function updateTopbarStats() {
     `Skills: ${SAVE.masteredSkills.length}/${totalSkillCount()}`;
   document.getElementById("stat-quests").textContent =
     `Quests: ${SAVE.completedQuests.length}/${totalQuestCount()}`;
+}
+
+/* ---------- Title Screen ---------- */
+
+function openTitleScreen() {
+  document.getElementById("topbar").classList.add("hidden");
+  const existing = loadSave();
+  const hasSave = hasAnyProgress(existing);
+  const continueBtn = document.getElementById("btn-continue");
+  continueBtn.disabled = !hasSave;
+  document.getElementById("title-save-info").textContent = hasSave
+    ? `Saved game found: ${existing.masteredSkills.length} skills mastered, ${existing.completedQuests.length} quests complete.`
+    : "No saved game yet — start a New Game to begin.";
+  showScreen("screen-title");
+}
+
+function startNewGame() {
+  const existing = loadSave();
+  if (hasAnyProgress(existing)) {
+    showModal(`
+      <h2>Start a new game?</h2>
+      <p>You have a saved game in progress (${existing.masteredSkills.length} skills, ${existing.completedQuests.length} quests). Starting a new game will erase it. This cannot be undone.</p>
+      <div class="modal-close-row">
+        <button class="btn-ghost" data-action="close-modal">Cancel</button>
+        <button class="btn-ghost danger" id="confirm-new-game">Erase and start fresh</button>
+      </div>
+    `);
+    document.getElementById("confirm-new-game").addEventListener("click", () => {
+      resetSave();
+      SAVE = defaultSave();
+      hideModal();
+      enterWorld();
+    });
+  } else {
+    resetSave();
+    SAVE = defaultSave();
+    enterWorld();
+  }
+}
+
+function continueGame() {
+  SAVE = loadSave();
+  enterWorld();
+}
+
+function enterWorld() {
+  document.getElementById("topbar").classList.remove("hidden");
+  updateTopbarStats();
+  renderMap();
+  showScreen("screen-map");
+}
+
+function openExitScreen() {
+  persist();
+  showScreen("screen-exit");
+  // Works only for windows opened by script; browsers block closing a
+  // user-opened tab, so we also show a friendly fallback message.
+  setTimeout(() => {
+    try {
+      window.close();
+    } catch (e) {
+      /* ignored — fallback screen is already showing */
+    }
+  }, 50);
 }
 
 /* ---------- World Map ---------- */
@@ -102,30 +190,22 @@ function renderMap() {
     `;
     node.addEventListener("click", () => {
       if (!unlocked) return;
-      if (region.id === "verdant-vale") {
-        openRegion();
-      } else {
-        showModal(
-          `<h2>${region.name}</h2>
-           <p>${region.blurb}</p>
-           <p style="color:var(--text-dim)">This region is coming in a future update. For now, prove your mastery in the Verdant Vale.</p>
-           <div class="modal-close-row"><button class="btn-primary" data-action="close-modal">Close</button></div>`
-        );
-      }
+      openRegion(region.id);
     });
     canvas.appendChild(node);
   });
 }
 
 function regionLabel(id) {
-  const r = REGIONS.find((r) => r.id === id);
+  const r = regionById(id);
   return r ? r.name : id;
 }
 
 /* ---------- Region Screen ---------- */
 
-function openRegion() {
-  const region = REGIONS.find((r) => r.id === CURRENT_REGION);
+function openRegion(regionId) {
+  currentRegionId = regionId;
+  const region = regionById(regionId);
   document.getElementById("region-title").textContent = region.name;
   document.getElementById("region-sub").textContent = region.blurb;
   renderLocationList();
@@ -135,12 +215,12 @@ function openRegion() {
 function renderLocationList() {
   const list = document.getElementById("location-list");
   list.innerHTML = "";
-  LOCATIONS.forEach((loc) => {
+  LOCATIONS.filter((loc) => loc.region === currentRegionId).forEach((loc) => {
     const quests = loc.quests;
-    const done = quests.filter((qid) => isQuestCompleted(qid)).length;
     const isBossLoc = !!loc.isBoss;
-    const bossReady = isBossLoc && isQuestAvailable("boss.mimic-merchant");
-    const bossDone = isBossLoc && isQuestCompleted("boss.mimic-merchant");
+    const bossQuestId = quests[0];
+    const bossReady = isBossLoc && isQuestAvailable(bossQuestId);
+    const bossDone = isBossLoc && isQuestCompleted(bossQuestId);
 
     const card = document.createElement("div");
     card.className = "location-card" + (isBossLoc ? " boss" : "");
@@ -148,6 +228,7 @@ function renderLocationList() {
     if (isBossLoc) {
       progressLabel = bossDone ? "Defeated ✓" : bossReady ? "Challenge available!" : "Locked — finish other quests first";
     } else {
+      const done = quests.filter((qid) => isQuestCompleted(qid)).length;
       progressLabel = `${done}/${quests.length} quests complete`;
     }
     card.innerHTML = `
@@ -165,7 +246,7 @@ function renderLocationList() {
 
 function openLocation(locId) {
   currentLocationId = locId;
-  const loc = LOCATIONS.find((l) => l.id === locId);
+  const loc = locationById(locId);
   document.getElementById("loc-npc-art").textContent = loc.npcArt;
   document.getElementById("loc-npc-name").textContent = loc.npc + " — " + loc.name;
   document.getElementById("loc-intro").textContent = loc.intro;
@@ -260,7 +341,7 @@ async function handleRunCode() {
   resultsBox.innerHTML = "";
 
   try {
-    const { passed, results } = await runChallenge(code, quest.tests, (msg) => {
+    const { passed, results } = await runChallenge(code, quest, (msg) => {
       statusEl.textContent = msg;
     });
 
@@ -302,7 +383,7 @@ function completeQuest(questId) {
   }
 
   if (quest.isBoss) {
-    handleBossVictory();
+    handleBossVictory(quest);
   } else if (!alreadyDone) {
     showModal(
       `<div class="victory-emoji">🏆</div>
@@ -315,17 +396,34 @@ function completeQuest(questId) {
   }
 }
 
-function handleBossVictory() {
-  const nextRegion = REGIONS.find((r) => r.requires === "verdant-vale");
+function handleBossVictory(quest) {
+  const clearedRegionId = questRegion(quest);
+  const nextRegion = REGIONS.find((r) => r.requires === clearedRegionId);
+
   if (nextRegion && !SAVE.unlockedRegions.includes(nextRegion.id)) {
     SAVE.unlockedRegions.push(nextRegion.id);
     persist();
   }
+
+  if (!nextRegion) {
+    // Final boss of the whole game.
+    showModal(
+      `<div class="victory-emoji">👑</div>
+       <h2>The Oracle bows before you.</h2>
+       <p>You have mastered every region of The World of Code — from your first variable to building and
+       evaluating a machine learning model of your own. You are, in every real sense, a Python programmer.</p>
+       <div class="modal-close-row">
+         <button class="btn-primary" data-action="close-modal-to-map">Return to the Map</button>
+       </div>`
+    );
+    return;
+  }
+
   showModal(
     `<div class="victory-emoji">🎉</div>
-     <h2>The Mimic Merchant is defeated!</h2>
-     <p>The illusion unravels, revealing the true path out of the Verdant Vale.</p>
-     <p><strong>${nextRegion ? nextRegion.name : "The next region"}</strong> has appeared on the World Map.</p>
+     <h2>${escapeHtml(regionLabel(clearedRegionId))} is cleared!</h2>
+     <p>The way forward opens.</p>
+     <p><strong>${escapeHtml(nextRegion.name)}</strong> has appeared on the World Map.</p>
      <div class="modal-close-row">
        <button class="btn-primary" data-action="close-modal-to-map">Return to the Map</button>
      </div>`
@@ -350,20 +448,22 @@ function openSkillTree() {
 }
 
 function renderSkillTree() {
+  const region = regionById(currentRegionId);
+  document.getElementById("skilltree-title").textContent = `${region.name} Skill Tree`;
+
   const canvas = document.getElementById("skilltree-canvas");
   canvas.innerHTML = "";
-  BRANCHES.forEach((branch) => {
+  BRANCHES.filter((b) => b.region === currentRegionId).forEach((branch) => {
     const col = document.createElement("div");
     col.className = "branch-col";
     const nodesHtml = SKILLS.filter((s) => s.branch === branch.id)
       .map((skill) => {
         const state = skillState(skill.id);
         const tag = state === "mastered" ? "Mastered" : state === "available" ? "Available" : "Locked";
-        const desc = skill.regionLocked ? skill.desc : skill.desc;
         return `
           <div class="skill-node ${state}" data-skill="${skill.id}" data-quest="${skill.quest || ""}">
             <div class="skill-name">${state === "mastered" ? "✓ " : state === "locked" && !skill.regionLocked ? "🔒 " : ""}${escapeHtml(skill.name)}</div>
-            <div class="skill-desc">${escapeHtml(desc)}</div>
+            <div class="skill-desc">${escapeHtml(skill.desc)}</div>
             <div class="skill-tag">${tag}</div>
           </div>
         `;
@@ -384,28 +484,30 @@ function renderSkillTree() {
 /* ---------- Quest Journal Modal ---------- */
 
 function openJournal() {
-  const rows = Object.values(QUESTS)
-    .map((q) => {
-      const done = isQuestCompleted(q.id);
-      const available = isQuestAvailable(q.id);
-      const status = done ? "Complete" : available ? "Available" : "Locked";
-      return `<div class="journal-item${done ? " done" : ""}">
-        <span>${q.isBoss ? "⚔️ " : ""}${escapeHtml(q.title)}</span>
-        <span class="j-status">${status}</span>
-      </div>`;
-    })
-    .join("");
+  const rows = REGIONS.map((region) => {
+    const regionQuests = Object.values(QUESTS).filter((q) => questRegion(q) === region.id);
+    if (regionQuests.length === 0) return "";
+    const items = regionQuests
+      .map((q) => {
+        const done = isQuestCompleted(q.id);
+        const available = isQuestAvailable(q.id);
+        const status = done ? "Complete" : available ? "Available" : "Locked";
+        return `<div class="journal-item${done ? " done" : ""}">
+          <span>${q.isBoss ? "⚔️ " : ""}${escapeHtml(q.title)}</span>
+          <span class="j-status">${status}</span>
+        </div>`;
+      })
+      .join("");
+    return `<div class="journal-section"><h4>${escapeHtml(region.name)}</h4>${items}</div>`;
+  }).join("");
 
   showModal(`
-    <h2>📖 Quest Journal — The Verdant Vale</h2>
+    <h2>📖 Quest Journal</h2>
     <div class="journal-section">
-      <h4>Progress</h4>
+      <h4>Overall Progress</h4>
       <p>${SAVE.masteredSkills.length}/${totalSkillCount()} skills mastered &middot; ${SAVE.completedQuests.length}/${totalQuestCount()} quests complete</p>
     </div>
-    <div class="journal-section">
-      <h4>Quests</h4>
-      ${rows}
-    </div>
+    ${rows}
     <div class="modal-close-row"><button class="btn-primary" data-action="close-modal">Close</button></div>
   `);
 }
@@ -457,6 +559,15 @@ document.getElementById("btn-journal").addEventListener("click", openJournal);
 document.getElementById("btn-run").addEventListener("click", handleRunCode);
 document.getElementById("btn-hint").addEventListener("click", handleRevealHint);
 
+document.getElementById("btn-new-game").addEventListener("click", startNewGame);
+document.getElementById("btn-continue").addEventListener("click", continueGame);
+document.getElementById("btn-exit").addEventListener("click", openExitScreen);
+document.getElementById("btn-exit-back").addEventListener("click", openTitleScreen);
+document.getElementById("btn-title").addEventListener("click", () => {
+  persist();
+  openTitleScreen();
+});
+
 document.getElementById("btn-reset").addEventListener("click", () => {
   showModal(`
     <h2>Reset progress?</h2>
@@ -490,5 +601,4 @@ document.getElementById("code-editor").addEventListener("keydown", (e) => {
 
 /* ---------- Boot ---------- */
 
-updateTopbarStats();
-renderMap();
+openTitleScreen();
