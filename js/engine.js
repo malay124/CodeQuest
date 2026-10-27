@@ -9,6 +9,38 @@ let currentQuestId = null;
 let currentLocationId = null;
 let currentRegionId = null;
 
+/* ---------- Code editor (CodeMirror, with a plain-textarea fallback) ---------- */
+
+let cmEditor = null;
+function initEditor() {
+  const textarea = document.getElementById("code-editor");
+  if (typeof CodeMirror === "undefined") return; // offline fallback: plain textarea still works
+  cmEditor = CodeMirror.fromTextArea(textarea, {
+    mode: "python",
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    lineNumbers: true,
+    matchBrackets: true,
+    styleActiveLine: true,
+    lineWrapping: true,
+    scrollbarStyle: "null",
+    extraKeys: {
+      Tab: (cm) => cm.replaceSelection("    ", "end"),
+    },
+  });
+}
+function getEditorValue() {
+  return cmEditor ? cmEditor.getValue() : document.getElementById("code-editor").value;
+}
+function setEditorValue(value) {
+  if (cmEditor) {
+    cmEditor.setValue(value);
+  } else {
+    document.getElementById("code-editor").value = value;
+  }
+}
+
 /* ---------- Derived game state helpers ---------- */
 
 function regionById(id) {
@@ -173,20 +205,43 @@ function openExitScreen() {
 
 /* ---------- World Map ---------- */
 
+function regionProgress(regionId) {
+  const quests = Object.values(QUESTS).filter((q) => questRegion(q) === regionId);
+  const done = quests.filter((q) => isQuestCompleted(q.id)).length;
+  return { done, total: quests.length };
+}
+
 function renderMap() {
   const canvas = document.getElementById("map-canvas");
   canvas.innerHTML = "";
+  const RADIUS = 24;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
   REGIONS.forEach((region) => {
     const unlocked = isRegionUnlocked(region.id);
+    const { done, total } = regionProgress(region.id);
+    const pct = total ? done / total : 0;
+    const cleared = unlocked && pct === 1;
+    const offset = CIRCUMFERENCE * (1 - pct);
+
     const node = document.createElement("div");
-    node.className = "region-node" + (unlocked ? "" : " locked");
+    node.className = "region-node" + (unlocked ? "" : " locked") + (cleared ? " cleared" : "");
     node.style.left = region.mapPos.x + "%";
     node.style.top = region.mapPos.y + "%";
     node.innerHTML = `
-      <div class="node-dot" style="background:${region.color}"></div>
+      <div class="node-ring-wrap">
+        <svg viewBox="0 0 58 58">
+          <circle class="node-ring-bg" cx="29" cy="29" r="${RADIUS}"></circle>
+          <circle class="node-ring-fg" cx="29" cy="29" r="${RADIUS}"
+            stroke="${region.color}"
+            stroke-dasharray="${CIRCUMFERENCE}"
+            stroke-dashoffset="${unlocked ? offset : CIRCUMFERENCE}"></circle>
+        </svg>
+        <div class="node-ring-icon">${unlocked ? (cleared ? "🏆" : "") : "🔒"}</div>
+      </div>
       <div class="node-name">${region.name}</div>
       <div class="node-sub">${region.subtitle}</div>
-      ${unlocked ? "" : `<div class="node-lock">🔒 Requires: ${regionLabel(region.requires)}</div>`}
+      ${unlocked ? (total ? `<div class="node-lock" style="color:var(--text-dim)">${done}/${total} quests</div>` : "") : `<div class="node-lock">🔒 Requires: ${regionLabel(region.requires)}</div>`}
     `;
     node.addEventListener("click", () => {
       if (!unlocked) return;
@@ -294,7 +349,7 @@ function openChallenge(questId) {
   document.getElementById("challenge-story").textContent = quest.story;
 
   const savedCode = SAVE.code[questId];
-  document.getElementById("code-editor").value = savedCode || quest.starter;
+  setEditorValue(savedCode || quest.starter);
 
   document.getElementById("hint-max").textContent = quest.hints.length;
   document.getElementById("hint-count").textContent = SAVE.hintsRevealed[questId] || 0;
@@ -304,6 +359,7 @@ function openChallenge(questId) {
   document.getElementById("run-status").textContent = "";
 
   showScreen("screen-challenge");
+  if (cmEditor) setTimeout(() => cmEditor.refresh(), 0);
 }
 
 function renderHintBox(questId) {
@@ -328,7 +384,7 @@ function escapeHtml(str) {
 
 async function handleRunCode() {
   const quest = QUESTS[currentQuestId];
-  const code = document.getElementById("code-editor").value;
+  const code = getEditorValue();
   SAVE.code[currentQuestId] = code;
   persist();
 
@@ -456,20 +512,32 @@ function renderSkillTree() {
   BRANCHES.filter((b) => b.region === currentRegionId).forEach((branch) => {
     const col = document.createElement("div");
     col.className = "branch-col";
-    const nodesHtml = SKILLS.filter((s) => s.branch === branch.id)
-      .map((skill) => {
+    const branchSkills = SKILLS.filter((s) => s.branch === branch.id);
+    const nodesHtml = branchSkills
+      .map((skill, i) => {
         const state = skillState(skill.id);
         const tag = state === "mastered" ? "Mastered" : state === "available" ? "Available" : "Locked";
+        const connector =
+          i > 0
+            ? `<div class="skill-connector${skillState(branchSkills[i - 1].id) === "mastered" ? " flow" : ""}"></div>`
+            : "";
+        const icon =
+          state === "mastered"
+            ? `<span class="skill-check">✓</span>`
+            : state === "locked" && !skill.regionLocked
+            ? "🔒"
+            : "";
         return `
+          ${connector}
           <div class="skill-node ${state}" data-skill="${skill.id}" data-quest="${skill.quest || ""}">
-            <div class="skill-name">${state === "mastered" ? "✓ " : state === "locked" && !skill.regionLocked ? "🔒 " : ""}${escapeHtml(skill.name)}</div>
+            <div class="skill-name">${icon} ${escapeHtml(skill.name)}</div>
             <div class="skill-desc">${escapeHtml(skill.desc)}</div>
             <div class="skill-tag">${tag}</div>
           </div>
         `;
       })
       .join("");
-    col.innerHTML = `<h3>${branch.name}</h3><p class="branch-desc">${branch.desc}</p>${nodesHtml}`;
+    col.innerHTML = `<h3>${branch.name}</h3><p class="branch-desc">${branch.desc}</p><div class="skill-chain">${nodesHtml}</div>`;
     canvas.appendChild(col);
   });
 
@@ -587,18 +655,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   });
 });
 
-// Tab key inserts spaces instead of moving focus out of the editor.
-document.getElementById("code-editor").addEventListener("keydown", (e) => {
-  if (e.key === "Tab") {
-    e.preventDefault();
-    const el = e.target;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    el.value = el.value.slice(0, start) + "    " + el.value.slice(end);
-    el.selectionStart = el.selectionEnd = start + 4;
-  }
-});
-
 /* ---------- Boot ---------- */
 
+initEditor();
 openTitleScreen();
